@@ -1,13 +1,6 @@
-import { initializeApp } from "firebase/app";
-import { getDatabase, ref, onValue } from "firebase/database";
-import * as functions from "firebase-functions";
 import * as dotenv from "dotenv";
-
 dotenv.config();
-
-// // Start writing Firebase Functions
-// // https://firebase.google.com/docs/functions/typescript
-//
+import { initializeApp } from "firebase/app";
 
 const firebaseConfig = {
   apiKey: process.env.API_KEY,
@@ -21,21 +14,6 @@ const firebaseConfig = {
   // measurementId: "G-MEASUREMENT_ID",
 };
 
-const app = initializeApp(firebaseConfig);
-const database = getDatabase(app);
+initializeApp(firebaseConfig);
 
-export const helloWorld = functions.https.onRequest((request, response) => {
-  functions.logger.info("Hello logs!", { structuredData: true });
-  const emailRef = ref(database, "email");
-
-  onValue(
-    emailRef,
-    (snapshot) => {
-      const data = snapshot.val();
-      response.send(JSON.stringify(data));
-    },
-    (err) => {
-      response.send("error");
-    }
-  );
-});
+export * from "./functions";
