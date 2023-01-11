@@ -4,6 +4,7 @@
     "build": "tsc",
     "build:watch": "tsc --watch",
     "serve": "npm run build && firebase emulators:start --only functions",
+    "serve:clean": "rm -rf lib && npm run serve",
     "shell": "npm run build && firebase functions:shell",
     "start": "npm run shell",
     "deploy": "firebase deploy --only functions",
@@ -14,6 +15,8 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "dotenv": "^16.0.3",
+    "firebase": "^9.13.0",
     "firebase-admin": "^10.0.2",
     "firebase-functions": "^3.18.0"
   },
