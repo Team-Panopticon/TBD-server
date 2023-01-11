@@ -69,5 +69,10 @@ export abstract class Model<T> {
     });
   }
 
+  /**
+   * Model에서 realtime database에 접근하는 경로입니다.
+   *
+   * 반드시 설정해야합니다.
+   */
   protected abstract get path(): string;
 }
