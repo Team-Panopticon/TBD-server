@@ -1,14 +1,18 @@
 type Meal = "lunch" | "dinner";
+export type ISODateTime = string;
+export type WithId<T> = T & { id: string };
 
 export type Meeting = {
   name: string;
-  dates: string[];
-  types: "date" | "meal";
+  dates: ISODateTime[];
+  type: "date" | "meal";
   status: "in progress" | "done";
+  deadline: ISODateTime;
   selectedDate?: {
     date: string;
     meal: Meal;
   };
+  password?: string; // sha256 hashed value in database
 };
 
 export type User = {
@@ -25,3 +29,5 @@ type Vote = {
   date: string;
   meal?: Meal;
 };
+
+export type CreateMeetingDto = Pick<Meeting, 'name' | 'dates' | 'type' | 'deadline' | 'password'>
