@@ -54,7 +54,7 @@ export abstract class Model<T> {
     const id = uuidv4();
 
     return new Promise<WithId<T>>((resolve, reject) => {
-      set(ref(this.database, `${this.path}/${uuidv4()}`), { ...document })
+      set(ref(this.database, `${this.path}/${id}`), { ...document })
         .then(() => {
           resolve({ id, ...document });
         })

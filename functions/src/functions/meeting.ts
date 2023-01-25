@@ -1,7 +1,8 @@
 import * as functions from "firebase-functions";
+import { createMeeting } from "../services/meetings";
+import { CreateMeetingDto } from "../types";
 // import { MeetingModel } from "../model/Meeting";
 
-// NOTE: Meeting 생성 샘플
 export const meetings = functions.https.onRequest(async (request, response) => {
   try {
     switch (request.method) {
@@ -36,13 +37,14 @@ export const getMeeting = async (request: functions.https.Request, response: fun
 
 export const postMeeting = async (request: functions.https.Request, response: functions.Response) => {
   functions.logger.info("POST Meeting!", { structuredData: true });
-  // Stub
-  response.send({
-    name: "test",
-    dates: [],
-    types: "meal",
-    status: "in progress",
-  })
+  // Input validation
+  const createMeetingDto = request.body as CreateMeetingDto;
+
+  // Call meetings service to create meeting
+  const createdMeeting = await createMeeting(createMeetingDto);
+
+  // Return created meeting in proper format
+  response.send(createdMeeting)
 }
 
 export const putMeeting = async (request: functions.https.Request, response: functions.Response) => {
