@@ -16,6 +16,7 @@
   },
   "main": "lib/index.js",
   "dependencies": {
+    "class-validator": "^0.14.0",
     "dotenv": "^16.0.3",
     "firebase": "^9.13.0",
     "firebase-admin": "^10.0.2",
