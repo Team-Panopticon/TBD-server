@@ -29,5 +29,3 @@ type Vote = {
   date: string;
   meal?: Meal;
 };
-
-export type CreateMeetingDto = Pick<Meeting, 'name' | 'dates' | 'type' | 'deadline' | 'password'>
