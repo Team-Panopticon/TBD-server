@@ -1,6 +1,8 @@
+import { plainToInstance } from "class-transformer";
+import { validateOrReject } from "class-validator";
 import * as functions from "firebase-functions";
+import { CreateMeetingDto } from "../dtos/meetings";
 import { createMeeting } from "../services/meetings";
-import { CreateMeetingDto } from "../types";
 // import { MeetingModel } from "../model/Meeting";
 
 export const meetings = functions.https.onRequest(async (request, response) => {
@@ -38,7 +40,14 @@ export const getMeeting = async (request: functions.https.Request, response: fun
 export const postMeeting = async (request: functions.https.Request, response: functions.Response) => {
   functions.logger.info("POST Meeting!", { structuredData: true });
   // Input validation
-  const createMeetingDto = request.body as CreateMeetingDto;
+  const createMeetingDto = plainToInstance(CreateMeetingDto, request.body);
+
+  try {
+    await validateOrReject(createMeetingDto);
+  } catch (errors) {
+    response.status(422).send({ message: "Invalid input" });
+    return;
+  }
 
   // Call meetings service to create meeting
   const createdMeeting = await createMeeting(createMeetingDto);

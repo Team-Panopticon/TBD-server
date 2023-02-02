@@ -1,6 +1,6 @@
 import { MeetingModel } from '../model/Meeting';
-import { CreateMeetingDto } from '../types'
 import { createHash } from 'crypto';
+import { CreateMeetingDto } from '../dtos/meetings';
 
 const meetingModel = new MeetingModel();
 
