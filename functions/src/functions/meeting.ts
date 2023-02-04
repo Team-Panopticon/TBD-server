@@ -37,7 +37,7 @@ const getMeeting = async (request: functions.https.Request, response: functions.
 const postMeeting = async (request: functions.https.Request, response: functions.Response) => {
   functions.logger.info("POST Meeting!", { structuredData: true });
   // Input validation
-  const createMeetingDto = request.body as CreateMeetingDto;
+  const createMeetingDto: CreateMeetingDto = request.body;
 
   // Call meetings service to create meeting
   const createdMeeting = await createMeeting(createMeetingDto);
