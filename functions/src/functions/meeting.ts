@@ -1,42 +1,58 @@
 import * as functions from "firebase-functions";
-import { MeetingModel } from "../model/Meeting";
+import { createMeeting } from "../services/meetings";
+import { CreateMeetingDto } from "../types";
 
-// NOTE: Meeting 생성 샘플
-
-export const createMeeting2 = functions.https.onRequest(async (request, response) => {
-  functions.logger.info("create Meeting!", { structuredData: true });
-
+export const meetings = functions.https.onRequest(async (request, response) => {
   try {
-    const Meeting = new MeetingModel();
-
-    const result = await Meeting.create({
-      name: "test",
-      dates: [],
-      types: "meal",
-      status: "in progress",
-    });
-
-    response.send(result);
-  } catch (err) {
-    response.send(err);
+    switch (request.method) {
+      case 'GET':
+        await getMeeting(request, response);
+        break;
+      case 'POST':
+        await postMeeting(request, response);
+        break;
+      case 'PUT':
+        await putMeeting(request, response);
+        break;
+      default:
+        response.status(405).send('Method Not Allowed');
+        break;
+    }
+  } catch (error) {
+    response.send(error);
   }
-});
+})
 
-export const createMeeting3 = functions.https.onRequest(async (request, response) => {
-  functions.logger.info("create Meeting!", { structuredData: true });
+const getMeeting = async (request: functions.https.Request, response: functions.Response) => {
+  functions.logger.info("GET Meeting!", { structuredData: true });
+  // Stub
+  response.send({
+    name: "test",
+    dates: [],
+    types: "meal",
+    status: "in progress",
+  })
+}
 
-  try {
-    const Meeting = new MeetingModel();
+const postMeeting = async (request: functions.https.Request, response: functions.Response) => {
+  functions.logger.info("POST Meeting!", { structuredData: true });
+  // Input validation
+  const createMeetingDto: CreateMeetingDto = request.body;
 
-    const result = await Meeting.create({
-      name: "test",
-      dates: [],
-      types: "meal",
-      status: "in progress",
-    });
+  // Call meetings service to create meeting
+  const createdMeeting = await createMeeting(createMeetingDto);
 
-    response.send(result);
-  } catch (err) {
-    response.send(err);
-  }
-});
+  // Return created meeting in proper format
+  response.send(createdMeeting)
+}
+
+const putMeeting = async (request: functions.https.Request, response: functions.Response) => {
+  functions.logger.info("PUT Meeting!", { structuredData: true });
+  // Stub 
+  response.send({
+    name: "test",
+    dates: [],
+    types: "meal",
+    status: "in progress",
+  })
+}

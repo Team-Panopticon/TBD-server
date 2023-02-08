@@ -9,6 +9,7 @@ import {
   remove,
   set,
 } from "firebase/database";
+import { WithId } from "../types";
 
 export abstract class Model<T> {
   prefixPath: string;
@@ -50,10 +51,12 @@ export abstract class Model<T> {
   }
 
   create(document: T) {
-    return new Promise<T>((resolve, reject) => {
-      set(ref(this.database, `${this.path}/${uuidv4()}`), { ...document })
+    const id = uuidv4();
+
+    return new Promise<WithId<T>>((resolve, reject) => {
+      set(ref(this.database, `${this.path}/${id}`), { ...document })
         .then(() => {
-          resolve(document);
+          resolve({ id, ...document });
         })
         .catch(reject);
     });
