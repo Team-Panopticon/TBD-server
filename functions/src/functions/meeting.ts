@@ -26,7 +26,7 @@ export const meetings = functions.https.onRequest(async (request, response) => {
   }
 })
 
-export const getMeeting = async (request: functions.https.Request, response: functions.Response) => {
+const getMeeting = async (request: functions.https.Request, response: functions.Response) => {
   functions.logger.info("GET Meeting!", { structuredData: true });
   // Stub
   response.send({
@@ -37,7 +37,7 @@ export const getMeeting = async (request: functions.https.Request, response: fun
   })
 }
 
-export const postMeeting = async (request: functions.https.Request, response: functions.Response) => {
+const postMeeting = async (request: functions.https.Request, response: functions.Response) => {
   functions.logger.info("POST Meeting!", { structuredData: true });
   // Input validation
   const createMeetingDto = plainToInstance(CreateMeetingDto, request.body);
@@ -56,7 +56,7 @@ export const postMeeting = async (request: functions.https.Request, response: fu
   response.send(createdMeeting)
 }
 
-export const putMeeting = async (request: functions.https.Request, response: functions.Response) => {
+const putMeeting = async (request: functions.https.Request, response: functions.Response) => {
   functions.logger.info("PUT Meeting!", { structuredData: true });
   // Stub 
   response.send({
