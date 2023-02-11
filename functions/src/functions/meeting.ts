@@ -50,10 +50,10 @@ const postMeeting = async (request: functions.https.Request, response: functions
   }
 
   // Call meetings service to create meeting
-  const createdMeeting = await createMeeting(createMeetingDto);
+  const { password, ...createdMeetingWithoutPassword } = await createMeeting(createMeetingDto);
 
   // Return created meeting in proper format
-  response.send(createdMeeting)
+  response.send(createdMeetingWithoutPassword);
 }
 
 const putMeeting = async (request: functions.https.Request, response: functions.Response) => {
