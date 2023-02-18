@@ -2,7 +2,7 @@ import { plainToInstance } from "class-transformer";
 import { validateOrReject } from "class-validator";
 import * as functions from "firebase-functions";
 import { CreateMeetingDto } from "../dtos/meetings";
-import { createMeeting } from "../services/meetings";
+import { createMeeting, findMeeting } from "../services/meetings";
 
 const cors = require('cors')({ origin: process.env.CORS_ORIGIN });
 
@@ -32,12 +32,23 @@ export const meetings = functions.https.onRequest(async (request, response) => {
 
 const getMeeting = async (request: functions.https.Request, response: functions.Response) => {
   functions.logger.info("GET Meeting!", { structuredData: true });
-  // Stub
-  response.send({
-    name: "test",
-    dates: [],
-    types: "meal",
-    status: "in progress",
+
+  cors(request, response, async () => {
+    const meetingId = request.path.split('/').pop();
+    if (meetingId === undefined || meetingId.length === 0) {
+      return response.status(404).send({ message: "Not found" });
+    }
+    
+    const meeting = await findMeeting(meetingId);
+    if (meeting === null) {
+      return response.status(404).send({ message: "Not found" });
+    }
+
+    const { password, ...meetingWithoutPassword } = meeting;
+    const meetingWithId = {  id: meetingId, ...meetingWithoutPassword };
+
+    // Return created meeting in proper format
+    return response.send(meetingWithId);
   })
 }
 

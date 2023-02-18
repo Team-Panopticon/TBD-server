@@ -22,3 +22,9 @@ export const createMeeting = async ({ name, dates, type, deadline, password }: C
 
   return createdMeeting;
 }
+
+export const findMeeting = async (meetingId: string) => {
+  const meeting = await meetingModel.find(meetingId);
+  
+  return meeting;
+}
