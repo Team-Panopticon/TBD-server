@@ -3,7 +3,8 @@ import { validateOrReject } from "class-validator";
 import * as functions from "firebase-functions";
 import { CreateMeetingDto } from "../dtos/meetings";
 import { createMeeting } from "../services/meetings";
-// import { MeetingModel } from "../model/Meeting";
+
+const cors = require('cors')({ origin: process.env.CORS_ORIGIN });
 
 export const meetings = functions.https.onRequest(async (request, response) => {
   try {
@@ -16,6 +17,9 @@ export const meetings = functions.https.onRequest(async (request, response) => {
         break;
       case 'PUT':
         await putMeeting(request, response);
+        break;
+      case 'OPTIONS':
+        await optionsMeeting(request, response);
         break;
       default:
         response.status(405).send('Method Not Allowed');
@@ -39,7 +43,10 @@ const getMeeting = async (request: functions.https.Request, response: functions.
 
 const postMeeting = async (request: functions.https.Request, response: functions.Response) => {
   functions.logger.info("POST Meeting!", { structuredData: true });
-  // Input validation
+  // CORS middleware
+  cors(request, response, async () => {
+  
+    // Input validation
   const createMeetingDto = plainToInstance(CreateMeetingDto, request.body);
 
   try {
@@ -54,6 +61,7 @@ const postMeeting = async (request: functions.https.Request, response: functions
 
   // Return created meeting in proper format
   response.send(createdMeetingWithoutPassword);
+  })
 }
 
 const putMeeting = async (request: functions.https.Request, response: functions.Response) => {
@@ -64,5 +72,13 @@ const putMeeting = async (request: functions.https.Request, response: functions.
     dates: [],
     types: "meal",
     status: "in progress",
+  })
+}
+
+const optionsMeeting = async (request: functions.https.Request, response: functions.Response) => {
+  functions.logger.info("OPTIONS Meeting!", { structuredData: true });
+  
+  cors(request, response, () => {
+    response.status(204).send();
   })
 }
