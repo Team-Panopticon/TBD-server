@@ -59,10 +59,4 @@ router.put("/", (req, res) => {
   });
 });
 
-router.options("/", (req, res) => {
-  functions.logger.info("OPTIONS Meeting!", { structuredData: true });
-
-  res.status(204).send();
-});
-
 export default router;
