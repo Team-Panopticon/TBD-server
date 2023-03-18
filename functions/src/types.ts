@@ -1,4 +1,4 @@
-type Meal = "lunch" | "dinner";
+export type Meal = "lunch" | "dinner";
   /** ISO8601 DateTime 형식 */
 export type ISODateTime = string;
 export type WithId<T> = T & { id: string };
@@ -23,12 +23,12 @@ export type User = {
   votings: Votings;
 };
 
-type Votings = {
+export type Votings = {
   date: Vote[];
   meal: Vote[];
 };
 
-type Vote = {
+export type Vote = {
   date: string;
   meal?: Meal;
 };
