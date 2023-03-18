@@ -8,6 +8,8 @@ import {
   ref,
   remove,
   set,
+  query,
+  QueryConstraint,
 } from "firebase/database";
 import { WithId } from "../types";
 
@@ -36,9 +38,9 @@ export abstract class Model<T> {
     });
   }
 
-  findAll() {
+  findAll(...queryConstraints: QueryConstraint[]) {
     return new Promise<{ [key: string]: T } | null>((resolve, reject) => {
-      get(child(this.dbRef, this.path))
+      get(query(child(this.dbRef, `${this.path}`), ...queryConstraints))
         .then((snapshot) => {
           if (snapshot.exists()) {
             resolve(snapshot.val());
