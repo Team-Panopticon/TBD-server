@@ -10,9 +10,35 @@ const router = express.Router();
 
 router.post(`/:meetingId/voting`, async (req, res) => {
   functions.logger.info("POST USER!", { structuredData: true });
-
   const { meetingId } = req.params;
+
+  const meeting = await findMeeting(meetingId);
+  if (meeting === null) {
+    res.status(404).send({ message: "Not found Meeting Info" });
+    return;
+  }
+  if (meeting.status === "done") {
+    res.status(400).send({ message: "Meeting Already Closed" });
+    return;
+  }
+
   const createUserDto = plainToInstance(CreateUserDto, req.body);
+  // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : date
+  createUserDto.date?.every((date) => {
+    if (meeting.dates?.indexOf(date.date) === -1) {
+      res.status(422).send({ message: "Invalid input" });
+      return false;
+    }
+    return true;
+  });
+  // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : meal
+  createUserDto.meal?.every((date) => {
+    if (meeting.dates?.indexOf(date.date) === -1) {
+      res.status(422).send({ message: "Invalid input" });
+      return false;
+    }
+    return true;
+  });
 
   try {
     await validateOrReject(createUserDto);
