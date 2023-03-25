@@ -24,7 +24,6 @@ router.get("/:meetingId", async (req, res) => {
   const { password, ...meetingWithoutPassword } = meeting;
   const meetingWithId = { id: meetingId, ...meetingWithoutPassword };
 
-  // Return created meeting in proper format
   return res.send(meetingWithId);
 });
 
@@ -41,10 +40,11 @@ router.post(`/`, async (req, res) => {
   }
 
   // Call meetings service to create meeting
-  const { password, ...createdMeetingWithoutPassword } = await createMeeting(createMeetingDto);
+  const { password, ...createdMeetingWithoutPassword } = await createMeeting(
+    createMeetingDto
+  );
 
-  // Return created meeting in proper format
-  res.send(createdMeetingWithoutPassword);
+  res.status(201).send(createdMeetingWithoutPassword);
 });
 
 router.put("/", (req, res) => {
