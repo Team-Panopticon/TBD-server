@@ -3,67 +3,40 @@ import { validateOrReject } from "class-validator";
 import * as functions from "firebase-functions";
 import { CreateMeetingDto } from "../dtos/meetings";
 import { createMeeting, findMeeting } from "../services/meetings";
+import * as express from "express";
 
-const cors = require('cors')({ origin: process.env.CORS_ORIGIN });
+const router = express.Router();
 
-export const meetings = functions.https.onRequest(async (request, response) => {
-  try {
-    switch (request.method) {
-      case 'GET':
-        await getMeeting(request, response);
-        break;
-      case 'POST':
-        await postMeeting(request, response);
-        break;
-      case 'PUT':
-        await putMeeting(request, response);
-        break;
-      case 'OPTIONS':
-        await optionsMeeting(request, response);
-        break;
-      default:
-        response.status(405).send('Method Not Allowed');
-        break;
-    }
-  } catch (error) {
-    response.send(error);
-  }
-})
-
-const getMeeting = async (request: functions.https.Request, response: functions.Response) => {
+router.get("/:meetingId", async (req, res) => {
   functions.logger.info("GET Meeting!", { structuredData: true });
 
-  cors(request, response, async () => {
-    const meetingId = request.path.split('/').pop();
-    if (meetingId === undefined || meetingId.length === 0) {
-      return response.status(404).send({ message: "Not found" });
-    }
-    
-    const meeting = await findMeeting(meetingId);
-    if (meeting === null) {
-      return response.status(404).send({ message: "Not found" });
-    }
+  const { meetingId } = req.params;
 
-    const { password, ...meetingWithoutPassword } = meeting;
-    const meetingWithId = {  id: meetingId, ...meetingWithoutPassword };
+  if (meetingId === undefined || meetingId.length === 0) {
+    return res.status(404).send({ message: "Not found" });
+  }
 
-    // Return created meeting in proper format
-    return response.send(meetingWithId);
-  })
-}
+  const meeting = await findMeeting(meetingId);
+  if (meeting === null) {
+    return res.status(404).send({ message: "Not found" });
+  }
 
-const postMeeting = async (request: functions.https.Request, response: functions.Response) => {
+  const { password, ...meetingWithoutPassword } = meeting;
+  const meetingWithId = { id: meetingId, ...meetingWithoutPassword };
+
+  // Return created meeting in proper format
+  return res.send(meetingWithId);
+});
+
+router.post(`/`, async (req, res) => {
   functions.logger.info("POST Meeting!", { structuredData: true });
-  // CORS middleware
-  cors(request, response, async () => {
-  
-    // Input validation
-  const createMeetingDto = plainToInstance(CreateMeetingDto, request.body);
+
+  const createMeetingDto = plainToInstance(CreateMeetingDto, req.body);
 
   try {
     await validateOrReject(createMeetingDto);
   } catch (errors) {
-    response.status(422).send({ message: "Invalid input" });
+    res.status(422).send({ message: "Invalid input" });
     return;
   }
 
@@ -71,25 +44,19 @@ const postMeeting = async (request: functions.https.Request, response: functions
   const { password, ...createdMeetingWithoutPassword } = await createMeeting(createMeetingDto);
 
   // Return created meeting in proper format
-  response.send(createdMeetingWithoutPassword);
-  })
-}
+  res.send(createdMeetingWithoutPassword);
+});
 
-const putMeeting = async (request: functions.https.Request, response: functions.Response) => {
+router.put("/", (req, res) => {
   functions.logger.info("PUT Meeting!", { structuredData: true });
-  // Stub 
-  response.send({
+
+  // Stub
+  res.send({
     name: "test",
     dates: [],
     types: "meal",
     status: "in progress",
-  })
-}
+  });
+});
 
-const optionsMeeting = async (request: functions.https.Request, response: functions.Response) => {
-  functions.logger.info("OPTIONS Meeting!", { structuredData: true });
-  
-  cors(request, response, () => {
-    response.status(204).send();
-  })
-}
+export default router;
