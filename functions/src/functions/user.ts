@@ -3,8 +3,9 @@ import { validateOrReject } from "class-validator";
 import * as functions from "firebase-functions";
 import { CreateUserDto } from "../dtos/user";
 import * as express from "express";
-import { createUser, getAllUser } from "../services/user";
+import { createUser, getAllUser, getUser } from "../services/user";
 import { findMeeting } from "../services/meetings";
+import { User } from "../types";
 
 const router = express.Router();
 
@@ -40,6 +41,11 @@ router.post(`/:meetingId/voting`, async (req, res) => {
     return true;
   });
 
+  const voting = await getUser(meetingId, createUserDto.name as string);
+  if (voting !== null) {
+    return res.status(422).send({ message: "Duplicated User Name" });
+  }
+
   try {
     await validateOrReject(createUserDto);
   } catch (errors) {
@@ -49,7 +55,7 @@ router.post(`/:meetingId/voting`, async (req, res) => {
 
   const { name } = await createUser(meetingId, createUserDto);
 
-  res.send(name);
+  return res.send(name);
 });
 
 router.options("/", (req, res) => {
@@ -73,11 +79,21 @@ router.get("/:meetingId/voting", async (req, res) => {
     return res.status(404).send({ message: "Not found Meeting Info" });
   }
 
-  const voting = await getAllUser(meetingId, name as string);
+  let voting: {
+    [key: string]: User;
+  } | null;
+  if (name) {
+    voting = await getUser(meetingId, name as string);
+  } else {
+    voting = await getAllUser(meetingId);
+  }
   if (voting === null) {
     return res.status(404).send({ message: "Not found Voting Info" });
   }
-  return res.send(voting);
+  const parsed = Object.entries(voting).map(([key, value]) => {
+    return { key: key, ...value };
+  });
+  return res.send(parsed);
 });
 
 export default router;

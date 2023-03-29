@@ -18,7 +18,14 @@ export const createUser = async (
   return createdUser;
 };
 
-export const getAllUser = async (meetingId: string, name?: string) => {
+export const getAllUser = async (meetingId: string) => {
+  const userModel = new UserModel(meetingId);
+  const meeting = await userModel.findAll();
+
+  return meeting;
+};
+
+export const getUser = async (meetingId: string, name: string) => {
   const userModel = new UserModel(meetingId);
   const quries = [orderByChild("name")];
   if (name && name !== "") quries.push(equalTo(name));
