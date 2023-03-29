@@ -58,12 +58,6 @@ router.post(`/:meetingId/voting`, async (req, res) => {
   return res.send(name);
 });
 
-router.options("/", (req, res) => {
-  functions.logger.info("OPTIONS USER!", { structuredData: true });
-
-  res.status(204).send();
-});
-
 router.get("/:meetingId/voting", async (req, res) => {
   const { meetingId } = req.params;
   const { name } = req.query;
