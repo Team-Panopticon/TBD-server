@@ -1,9 +1,9 @@
-import { User } from "./../types";
+import { Voting } from "./../types";
 import { Model } from "./Model";
 
-export class UserModel extends Model<User> {
+export class VotingModel extends Model<Voting> {
   constructor(public meetingId: string) {
-    super("users");
+    super("votings");
   }
 
   protected get path() {

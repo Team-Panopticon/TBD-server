@@ -1,5 +1,5 @@
 export type Meal = "lunch" | "dinner";
-  /** ISO8601 DateTime 형식 */
+/** ISO8601 DateTime 형식 */
 export type ISODateTime = string;
 export type WithId<T> = T & { id: string };
 
@@ -18,12 +18,12 @@ export type Meeting = {
   password?: string; // sha256 hashed value in database
 };
 
-export type User = {
-  name: string;
-  votings: Votings;
+export type Voting = {
+  userName: string;
+  votingDatas: VotingDatas;
 };
 
-export type Votings = {
+export type VotingDatas = {
   date: Vote[];
   meal: Vote[];
 };

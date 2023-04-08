@@ -10,6 +10,7 @@ import {
   set,
   query,
   QueryConstraint,
+  update,
 } from "firebase/database";
 import { WithId } from "../types";
 
@@ -69,6 +70,15 @@ export abstract class Model<T> {
       remove(ref(this.database, `${this.path}/${id}`))
         .then(() => {
           resolve(true);
+        })
+        .catch(reject);
+    });
+  }
+  upadate(id: string, document: object) {
+    return new Promise((resolve, reject) => {
+      update(ref(this.database, `${this.path}/${id}`), { ...document })
+        .then(() => {
+          resolve({ id, ...document });
         })
         .catch(reject);
     });
