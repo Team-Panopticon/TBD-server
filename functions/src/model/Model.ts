@@ -74,7 +74,7 @@ export abstract class Model<T> {
         .catch(reject);
     });
   }
-  upadate(id: string, document: object) {
+  update(id: string, document: object) {
     return new Promise((resolve, reject) => {
       update(ref(this.database, `${this.path}/${id}`), { ...document })
         .then(() => {

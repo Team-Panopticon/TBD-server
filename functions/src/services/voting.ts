@@ -33,3 +33,21 @@ export const getVotings = async (meetingId: string, userName?: string) => {
 
   return votings;
 };
+
+export const updateVoting = async (
+  meetingId: string,
+  votingId: string,
+  { userName, date = [], meal = [] }: CreateVotingDto
+) => {
+  const votingModel = new VotingModel(meetingId);
+
+  const meeting = await votingModel.update(votingId, {
+    userName,
+    votingDatas: {
+      date,
+      meal,
+    },
+  });
+
+  return meeting;
+};

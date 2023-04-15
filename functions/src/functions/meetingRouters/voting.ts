@@ -3,7 +3,12 @@ import { validateOrReject } from "class-validator";
 import * as functions from "firebase-functions";
 import { CreateVotingDto } from "../../dtos/votings";
 import * as express from "express";
-import { createVoting, getVoting, getVotings } from "../../services/voting";
+import {
+  createVoting,
+  getVoting,
+  getVotings,
+  updateVoting,
+} from "../../services/voting";
 import { findMeeting } from "../../services/meetings";
 import { Voting } from "../../types";
 
@@ -85,7 +90,7 @@ router.get("/:meetingId/voting", async (req, res) => {
 
 router.get("/:meetingId/voting/:votingId", async (req, res) => {
   const { meetingId, votingId } = req.params;
-  functions.logger.info("put Meeting/Voting! votingId =" + votingId, {
+  functions.logger.info("GET Meeting/Voting! votingId =" + votingId, {
     structuredData: true,
   });
   if (
@@ -97,6 +102,56 @@ router.get("/:meetingId/voting/:votingId", async (req, res) => {
 
   const Voting = await getVoting(meetingId, votingId);
   return res.send(Voting);
+});
+
+router.put("/:meetingId/voting/:votingId", async (req, res) => {
+  const { meetingId, votingId } = req.params;
+  functions.logger.info("PUT Meeting/Voting! votingId =" + votingId, {
+    structuredData: true,
+  });
+  if (
+    (meetingId === undefined || meetingId.length === 0,
+    votingId === undefined || votingId.length === 0)
+  ) {
+    return res.status(404).send({ message: "Invalid input" });
+  }
+
+  const createVotingDto = plainToInstance(CreateVotingDto, req.body);
+  const meeting = await findMeeting(meetingId);
+  if (meeting === null) {
+    res.status(404).send({ message: "Not found Meeting Info" });
+    return;
+  }
+  if (meeting.status === "done") {
+    res.status(400).send({ message: "Meeting Already Closed" });
+    return;
+  }
+
+  createVotingDto.date?.every((date) => {
+    if (meeting.dates?.indexOf(date.date) === -1) {
+      res.status(422).send({ message: "Invalid input" });
+      return false;
+    }
+    return true;
+  });
+  // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : meal
+  createVotingDto.meal?.every((date) => {
+    if (meeting.dates?.indexOf(date.date) === -1) {
+      res.status(422).send({ message: "Invalid input" });
+      return false;
+    }
+    return true;
+  });
+
+  try {
+    await validateOrReject(createVotingDto);
+  } catch (errors) {
+    res.status(422).send({ message: "Invalid input" });
+    return;
+  }
+  await updateVoting(meetingId, votingId, createVotingDto);
+
+  return res.sendStatus(200);
 });
 
 export default router;
