@@ -27,7 +27,7 @@ export const getVoting = async (meetingId: string, votingId: string) => {
 
 export const getVotings = async (meetingId: string, userName?: string) => {
   const votingModel = new VotingModel(meetingId);
-  const quries = [orderByChild("name")];
+  const quries = [orderByChild("userName")];
   if (userName && userName !== "") quries.push(equalTo(userName));
   const votings = await votingModel.findAll(...quries);
 

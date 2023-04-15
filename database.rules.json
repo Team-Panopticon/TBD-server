@@ -2,9 +2,9 @@
   "rules": {
     ".read": true,
     ".write": true,
-    "users": {
+    "votings": {
       "$key": {
-        ".indexOn": ["name"]
+        ".indexOn": ["userName"]
       }
     }
   }

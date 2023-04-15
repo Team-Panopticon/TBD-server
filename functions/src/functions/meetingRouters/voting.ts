@@ -1,11 +1,11 @@
 import { plainToInstance } from "class-transformer";
 import { validateOrReject } from "class-validator";
 import * as functions from "firebase-functions";
-import { CreateVotingDto } from "../dtos/votings";
+import { CreateVotingDto } from "../../dtos/votings";
 import * as express from "express";
-import { createVoting, getVoting, getVotings } from "../services/voting";
-import { findMeeting } from "../services/meetings";
-import { Voting } from "../types";
+import { createVoting, getVoting, getVotings } from "../../services/voting";
+import { findMeeting } from "../../services/meetings";
+import { Voting } from "../../types";
 
 const router = express.Router();
 
@@ -41,12 +41,6 @@ router.post(`/:meetingId/voting`, async (req, res) => {
     return true;
   });
 
-  // 유저네임 중복 체크
-  // const voting = await getVotings(meetingId, CreateVotingDto.name as string);
-  // if (voting !== null) {
-  //   return res.status(422).send({ message: "Duplicated User Name" });
-  // }
-
   try {
     await validateOrReject(createVotingDto);
   } catch (errors) {
@@ -69,6 +63,7 @@ router.get("/:meetingId/voting", async (req, res) => {
     return res.status(404).send({ message: "Invalid input" });
   }
 
+  // 미팅이 존재하는지 검사
   const meeting = await findMeeting(meetingId);
   if (meeting === null) {
     return res.status(404).send({ message: "Not found Meeting Info" });
