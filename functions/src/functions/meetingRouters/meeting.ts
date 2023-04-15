@@ -24,7 +24,6 @@ router.get("/:meetingId", async (req, res) => {
   const { password, ...meetingWithoutPassword } = meeting;
   const meetingWithId = { id: meetingId, ...meetingWithoutPassword };
 
-  // Return created meeting in proper format
   return res.send(meetingWithId);
 });
 
@@ -45,8 +44,7 @@ router.post(`/`, async (req, res) => {
     createMeetingDto
   );
 
-  // Return created meeting in proper format
-  res.send(createdMeetingWithoutPassword);
+  res.status(201).send(createdMeetingWithoutPassword);
 });
 
 router.put("/", (req, res) => {
@@ -59,12 +57,6 @@ router.put("/", (req, res) => {
     types: "meal",
     status: "in progress",
   });
-});
-
-router.options("/", (req, res) => {
-  functions.logger.info("OPTIONS Meeting!", { structuredData: true });
-
-  res.status(204).send();
 });
 
 export default router;

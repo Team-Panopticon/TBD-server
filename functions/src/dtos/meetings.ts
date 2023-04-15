@@ -1,9 +1,16 @@
-import { IsString, IsDateString, IsOptional, Matches, Length, MinLength, ArrayNotEmpty } from 'class-validator';
-import { ISODateTime } from '../types';
+import {
+  IsString,
+  IsDateString,
+  IsOptional,
+  Matches,
+  Length,
+  ArrayNotEmpty,
+} from "class-validator";
+import { ISODateTime } from "../types";
 
 export class CreateMeetingDto {
   @IsString()
-  @MinLength(1)
+  @Length(1, 100)
   name: string;
 
   @ArrayNotEmpty()
@@ -21,5 +28,7 @@ export class CreateMeetingDto {
   @IsString()
   @Length(4, 4)
   @Matches(/^[0-9]+$/)
-  password?: string; // sha256 hashed value in database
+  // plain string in DTO
+  // sha256 hash is stored in database
+  password?: string;
 }
