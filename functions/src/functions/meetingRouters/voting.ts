@@ -58,7 +58,7 @@ router.post(`/:meetingId/voting`, async (req, res) => {
   return res.send(userName);
 });
 
-router.get("/:meetingId/voting", async (req, res) => {
+router.get("/:meetingId/votings", async (req, res) => {
   const { meetingId } = req.params;
   const { userName } = req.query;
   functions.logger.info("GET Meeting/Voting! userName =" + userName, {
@@ -88,7 +88,7 @@ router.get("/:meetingId/voting", async (req, res) => {
   return res.send(parsed);
 });
 
-router.get("/:meetingId/voting/:votingId", async (req, res) => {
+router.get("/:meetingId/votings/:votingId", async (req, res) => {
   const { meetingId, votingId } = req.params;
   functions.logger.info("GET Meeting/Voting! votingId =" + votingId, {
     structuredData: true,
@@ -104,7 +104,7 @@ router.get("/:meetingId/voting/:votingId", async (req, res) => {
   return res.send(Voting);
 });
 
-router.put("/:meetingId/voting/:votingId", async (req, res) => {
+router.put("/:meetingId/votings/:votingId", async (req, res) => {
   const { meetingId, votingId } = req.params;
   functions.logger.info("PUT Meeting/Voting! votingId =" + votingId, {
     structuredData: true,
