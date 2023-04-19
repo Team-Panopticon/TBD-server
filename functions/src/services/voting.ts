@@ -9,10 +9,8 @@ export const createVoting = async (
 
   const createdVoting = await votingModel.create({
     userName,
-    votingDatas: {
-      date,
-      meal,
-    },
+    date,
+    meal,
   });
 
   return createdVoting;
@@ -41,13 +39,11 @@ export const updateVoting = async (
 ) => {
   const votingModel = new VotingModel(meetingId);
 
-  const meeting = await votingModel.update(votingId, {
+  const voting = await votingModel.update(votingId, {
     userName,
-    votingDatas: {
-      date,
-      meal,
-    },
+    date,
+    meal,
   });
 
-  return meeting;
+  return voting;
 };

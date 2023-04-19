@@ -14,7 +14,7 @@ import {
 } from "firebase/database";
 import { WithId } from "../types";
 
-export abstract class Model<T> {
+export abstract class Model<T extends object> {
   prefixPath: string;
   private database: Database;
   private dbRef: DatabaseReference;
@@ -74,12 +74,10 @@ export abstract class Model<T> {
         .catch(reject);
     });
   }
-  update(id: string, document: object) {
-    return new Promise((resolve, reject) => {
+  update(id: string, document: T) {
+    return new Promise<WithId<T>>((resolve, reject) => {
       update(ref(this.database, `${this.path}/${id}`), { ...document })
-        .then(() => {
-          resolve({ id, ...document });
-        })
+        .then(() => resolve({ id, ...document }))
         .catch(reject);
     });
   }

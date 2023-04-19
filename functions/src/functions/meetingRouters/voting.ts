@@ -83,7 +83,7 @@ router.get("/:meetingId/voting", async (req, res) => {
   }
 
   const parsed = Object.entries(voting).map(([key, value]) => {
-    return { key: key, ...value };
+    return { id: key, ...value };
   });
   return res.send(parsed);
 });
@@ -126,7 +126,7 @@ router.put("/:meetingId/voting/:votingId", async (req, res) => {
     res.status(400).send({ message: "Meeting Already Closed" });
     return;
   }
-
+  // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : date
   createVotingDto.date?.every((date) => {
     if (meeting.dates?.indexOf(date.date) === -1) {
       res.status(422).send({ message: "Invalid input" });
@@ -149,9 +149,9 @@ router.put("/:meetingId/voting/:votingId", async (req, res) => {
     res.status(422).send({ message: "Invalid input" });
     return;
   }
-  await updateVoting(meetingId, votingId, createVotingDto);
+  const voting = await updateVoting(meetingId, votingId, createVotingDto);
 
-  return res.sendStatus(200);
+  return res.send(voting);
 });
 
 export default router;

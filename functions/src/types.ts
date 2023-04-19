@@ -20,7 +20,8 @@ export type Meeting = {
 
 export type Voting = {
   userName: string;
-  votingDatas: VotingDatas;
+  date: Vote[];
+  meal: Vote[];
 };
 
 export type VotingDatas = {
