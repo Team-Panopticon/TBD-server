@@ -24,11 +24,6 @@ export type Voting = {
   meal: Vote[];
 };
 
-export type VotingDatas = {
-  date: Vote[];
-  meal: Vote[];
-};
-
 export type Vote = {
   date: string;
   meal?: Meal;
