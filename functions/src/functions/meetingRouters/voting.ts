@@ -11,6 +11,7 @@ import {
 } from "../../services/voting";
 import { findMeeting } from "../../services/meetings";
 import { Voting } from "../../types";
+// import { APIErrorResponse, ErrorCode } from "../../model/Error";
 
 const router = express.Router();
 
@@ -30,7 +31,7 @@ router.post(`/:meetingId/voting`, async (req, res) => {
 
   const createVotingDto = plainToInstance(CreateVotingDto, req.body);
   // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : date
-  createVotingDto.date?.every((date) => {
+  createVotingDto.dateType?.every((date) => {
     if (meeting.dates?.indexOf(date.date) === -1) {
       res.status(422).send({ message: "Invalid input" });
       return false;
@@ -38,7 +39,7 @@ router.post(`/:meetingId/voting`, async (req, res) => {
     return true;
   });
   // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : meal
-  createVotingDto.meal?.every((date) => {
+  createVotingDto.mealType?.every((date) => {
     if (meeting.dates?.indexOf(date.date) === -1) {
       res.status(422).send({ message: "Invalid input" });
       return false;
@@ -127,7 +128,7 @@ router.put("/:meetingId/votings/:votingId", async (req, res) => {
     return;
   }
   // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : date
-  createVotingDto.date?.every((date) => {
+  createVotingDto.dateType?.every((date) => {
     if (meeting.dates?.indexOf(date.date) === -1) {
       res.status(422).send({ message: "Invalid input" });
       return false;
@@ -135,7 +136,7 @@ router.put("/:meetingId/votings/:votingId", async (req, res) => {
     return true;
   });
   // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : meal
-  createVotingDto.meal?.every((date) => {
+  createVotingDto.mealType?.every((date) => {
     if (meeting.dates?.indexOf(date.date) === -1) {
       res.status(422).send({ message: "Invalid input" });
       return false;

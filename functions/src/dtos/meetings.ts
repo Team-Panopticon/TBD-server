@@ -6,7 +6,7 @@ import {
   Length,
   ArrayNotEmpty,
 } from "class-validator";
-import { ISODateTime } from "../types";
+import { ISODateTime, MeetingType } from "../types";
 
 export class CreateMeetingDto {
   @IsString()
@@ -18,8 +18,8 @@ export class CreateMeetingDto {
   dates: ISODateTime[];
 
   @IsString()
-  @Matches(/^(date|meal)$/)
-  type: "date" | "meal";
+  @Matches(/^dateType|mealType$/)
+  type: MeetingType;
 
   @IsDateString()
   deadline: ISODateTime;

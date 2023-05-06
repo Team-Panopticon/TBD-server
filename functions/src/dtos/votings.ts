@@ -1,5 +1,5 @@
 import { IsOptional, IsString, MinLength } from "class-validator";
-import { Vote } from "../types";
+import { Slot } from "../types";
 
 export class CreateVotingDto {
   @IsString()
@@ -7,8 +7,8 @@ export class CreateVotingDto {
   userName: string;
 
   @IsOptional()
-  date?: Vote[];
+  dateType?: Slot[];
 
   @IsOptional()
-  meal?: Vote[];
+  mealType?: Slot[];
 }

@@ -3,14 +3,14 @@ import { VotingModel } from "../model/Voting";
 import { equalTo, orderByChild } from "firebase/database";
 export const createVoting = async (
   meetingId: string,
-  { userName, date = [], meal = [] }: CreateVotingDto
+  { userName, dateType = [], mealType = [] }: CreateVotingDto
 ) => {
   const votingModel = new VotingModel(meetingId);
 
   const createdVoting = await votingModel.create({
     userName,
-    date,
-    meal,
+    dateType,
+    mealType,
   });
 
   return createdVoting;
@@ -35,14 +35,14 @@ export const getVotings = async (meetingId: string, userName?: string) => {
 export const updateVoting = async (
   meetingId: string,
   votingId: string,
-  { userName, date = [], meal = [] }: CreateVotingDto
+  { userName, dateType = [], mealType = [] }: CreateVotingDto
 ) => {
   const votingModel = new VotingModel(meetingId);
 
   const voting = await votingModel.update(votingId, {
     userName,
-    date,
-    meal,
+    dateType,
+    mealType,
   });
 
   return voting;

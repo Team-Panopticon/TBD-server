@@ -1,3 +1,4 @@
+import { MeetingType } from '../types';
 import { CreateMeetingDto } from './meetings';
 import { validateOrReject } from 'class-validator';
 
@@ -5,7 +6,7 @@ const getSampleCreateMeetingDto = () => {
   let createMeetingDto = new CreateMeetingDto();
   createMeetingDto.name = 'My Meeting';
   createMeetingDto.dates = ['2021-01-01T00:00:00.000Z', '2021-01-02T00:00:00.000Z'];
-  createMeetingDto.type = 'date';
+  createMeetingDto.type = MeetingType.dateType;
   createMeetingDto.deadline = '2021-01-01T00:00:00.000Z';
   createMeetingDto.password = '1234';
 
