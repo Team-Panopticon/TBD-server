@@ -11,7 +11,6 @@ import {
 } from "../../services/voting";
 import { findMeeting } from "../../services/meetings";
 import { Voting } from "../../types";
-// import { APIErrorResponse, ErrorCode } from "../../model/Error";
 
 const router = express.Router();
 
@@ -75,15 +74,15 @@ router.get("/:meetingId/votings", async (req, res) => {
     return res.status(404).send({ message: "Not found Meeting Info" });
   }
 
-  let voting: {
+  let votings: {
     [key: string]: Voting;
   } | null = await getVotings(meetingId, userName as string);
 
-  if (voting === null) {
+  if (votings === null) {
     return res.status(404).send({ message: "Not found Voting Info" });
   }
 
-  const parsed = Object.entries(voting).map(([key, value]) => {
+  const parsed = Object.entries(votings).map(([key, value]) => {
     return { id: key, ...value };
   });
   return res.send(parsed);
