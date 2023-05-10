@@ -1,8 +1,8 @@
 import { plainToInstance } from "class-transformer";
 import { validateOrReject } from "class-validator";
 import * as functions from "firebase-functions";
-import { CreateMeetingDto } from "../dtos/meetings";
-import { createMeeting, findMeeting } from "../services/meetings";
+import { CreateMeetingDto } from "../../dtos/meetings";
+import { createMeeting, findMeeting } from "../../services/meetings";
 import * as express from "express";
 
 const router = express.Router();

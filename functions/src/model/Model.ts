@@ -8,10 +8,13 @@ import {
   ref,
   remove,
   set,
+  query,
+  QueryConstraint,
+  update,
 } from "firebase/database";
 import { WithId } from "../types";
 
-export abstract class Model<T> {
+export abstract class Model<T extends object> {
   prefixPath: string;
   private database: Database;
   private dbRef: DatabaseReference;
@@ -36,9 +39,9 @@ export abstract class Model<T> {
     });
   }
 
-  findAll() {
+  findAll(...queryConstraints: QueryConstraint[]) {
     return new Promise<{ [key: string]: T } | null>((resolve, reject) => {
-      get(child(this.dbRef, this.path))
+      get(query(child(this.dbRef, `${this.path}`), ...queryConstraints))
         .then((snapshot) => {
           if (snapshot.exists()) {
             resolve(snapshot.val());
@@ -68,6 +71,13 @@ export abstract class Model<T> {
         .then(() => {
           resolve(true);
         })
+        .catch(reject);
+    });
+  }
+  update(id: string, document: T) {
+    return new Promise<WithId<T>>((resolve, reject) => {
+      update(ref(this.database, `${this.path}/${id}`), { ...document })
+        .then(() => resolve({ id, ...document }))
         .catch(reject);
     });
   }
