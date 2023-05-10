@@ -30,21 +30,25 @@ router.post(`/:meetingId/voting`, async (req, res) => {
 
   const createVotingDto = plainToInstance(CreateVotingDto, req.body);
   // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : date
-  createVotingDto.dateType?.every((date) => {
-    if (meeting.dates?.indexOf(date.date) === -1) {
-      res.status(422).send({ message: "Invalid input" });
+  const validDate = createVotingDto.dateType?.every((date) => {
+    if (meeting.dates?.includes(date.date)) {
       return false;
     }
     return true;
   });
   // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : meal
-  createVotingDto.mealType?.every((date) => {
-    if (meeting.dates?.indexOf(date.date) === -1) {
-      res.status(422).send({ message: "Invalid input" });
+  const isValidMeal = createVotingDto.mealType?.every((date) => {
+    if (meeting.dates?.includes(date.date)) {
       return false;
     }
     return true;
   });
+
+  if (!validDate || !isValidMeal) {
+    return res.status(422).send({
+      message: "Invalid input, Selected Date not included in Meeting",
+    });
+  }
 
   try {
     await validateOrReject(createVotingDto);
@@ -53,9 +57,9 @@ router.post(`/:meetingId/voting`, async (req, res) => {
     return;
   }
 
-  const { userName } = await createVoting(meetingId, createVotingDto);
+  const createdVoting = await createVoting(meetingId, createVotingDto);
 
-  return res.send(userName);
+  return res.status(201).send(createdVoting);
 });
 
 router.get("/:meetingId/votings", async (req, res) => {
@@ -94,10 +98,12 @@ router.get("/:meetingId/votings/:votingId", async (req, res) => {
     structuredData: true,
   });
   if (
-    (meetingId === undefined || meetingId.length === 0,
-    votingId === undefined || votingId.length === 0)
+    meetingId === undefined ||
+    meetingId.length === 0 ||
+    votingId === undefined ||
+    votingId.length === 0
   ) {
-    return res.status(404).send({ message: "Invalid input" });
+    return res.status(422).send({ message: "Invalid input" });
   }
 
   const Voting = await getVoting(meetingId, votingId);
@@ -110,10 +116,12 @@ router.put("/:meetingId/votings/:votingId", async (req, res) => {
     structuredData: true,
   });
   if (
-    (meetingId === undefined || meetingId.length === 0,
-    votingId === undefined || votingId.length === 0)
+    meetingId === undefined ||
+    meetingId.length === 0 ||
+    votingId === undefined ||
+    votingId.length === 0
   ) {
-    return res.status(404).send({ message: "Invalid input" });
+    return res.status(422).send({ message: "Invalid input" });
   }
 
   const createVotingDto = plainToInstance(CreateVotingDto, req.body);
