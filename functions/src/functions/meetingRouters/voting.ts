@@ -60,11 +60,7 @@ router.get("/:meetingId/votings", async (req, res) => {
 
   let votings: {
     [key: string]: Voting;
-  } | null = await getVotings(meetingId, userName as string);
-
-  if (votings === null) {
-    return res.status(404).send({ message: "Not found Voting Info" });
-  }
+  } = (await getVotings(meetingId, userName as string)) ?? {};
 
   const parsed = Object.entries(votings).map(([key, value]) => {
     return { id: key, ...value };
