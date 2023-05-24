@@ -132,21 +132,18 @@ router.put("/:meetingId/votings/:votingId", async (req, res) => {
 export default router;
 
 // validation 함수들의 위치 고민
-const isValidateMeetingInput = (
-  createVotingDto: CreateVotingDto,
-  meeting: Meeting
-) => {
+const isValidateMeetingInput = (createVotingDto: CreateVotingDto, meeting: Meeting) => {
   // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : date
   const isValidDate =
     createVotingDto.dateType === undefined ||
     createVotingDto.dateType.every((date) => {
-      return !meeting.dates?.includes(date.date);
+      return meeting.dates?.includes(date.date);
     });
   // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : meal
   const isValidMeal =
     createVotingDto.mealType === undefined ||
     createVotingDto.mealType.every((date) => {
-      return !meeting.dates?.includes(date.date);
+      return meeting.dates?.includes(date.date);
     });
   return isValidDate && isValidMeal;
 };
