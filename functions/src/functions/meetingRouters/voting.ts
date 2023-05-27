@@ -10,7 +10,7 @@ import {
   updateVoting,
 } from "../../services/voting";
 import { findMeeting } from "../../services/meetings";
-import { Voting } from "../../types";
+import { Meeting, Voting } from "../../types";
 
 const router = express.Router();
 
@@ -29,32 +29,12 @@ router.post(`/:meetingId/voting`, async (req, res) => {
   }
 
   const createVotingDto = plainToInstance(CreateVotingDto, req.body);
-  // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : date
-  const validDate = createVotingDto.dateType?.every((date) => {
-    if (meeting.dates?.includes(date.date)) {
-      return false;
-    }
-    return true;
-  });
-  // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : meal
-  const isValidMeal = createVotingDto.mealType?.every((date) => {
-    if (meeting.dates?.includes(date.date)) {
-      return false;
-    }
-    return true;
-  });
 
-  if (!validDate || !isValidMeal) {
+  // 유효성 검사
+  if (isValidateMeetingInput(createVotingDto, meeting) === false) {
     return res.status(422).send({
       message: "Invalid input, Selected Date not included in Meeting",
     });
-  }
-
-  try {
-    await validateOrReject(createVotingDto);
-  } catch (errors) {
-    res.status(422).send({ message: "Invalid input" });
-    return;
   }
 
   const createdVoting = await createVoting(meetingId, createVotingDto);
@@ -80,11 +60,7 @@ router.get("/:meetingId/votings", async (req, res) => {
 
   let votings: {
     [key: string]: Voting;
-  } | null = await getVotings(meetingId, userName as string);
-
-  if (votings === null) {
-    return res.status(404).send({ message: "Not found Voting Info" });
-  }
+  } = (await getVotings(meetingId, userName as string)) ?? {};
 
   const parsed = Object.entries(votings).map(([key, value]) => {
     return { id: key, ...value };
@@ -134,22 +110,13 @@ router.put("/:meetingId/votings/:votingId", async (req, res) => {
     res.status(400).send({ message: "Meeting Already Closed" });
     return;
   }
-  // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : date
-  createVotingDto.dateType?.every((date) => {
-    if (meeting.dates?.indexOf(date.date) === -1) {
-      res.status(422).send({ message: "Invalid input" });
-      return false;
-    }
-    return true;
-  });
-  // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : meal
-  createVotingDto.mealType?.every((date) => {
-    if (meeting.dates?.indexOf(date.date) === -1) {
-      res.status(422).send({ message: "Invalid input" });
-      return false;
-    }
-    return true;
-  });
+
+  // 유효성 검사
+  if (isValidateMeetingInput(createVotingDto, meeting) === false) {
+    return res.status(422).send({
+      message: "Invalid input, Selected Date not included in Meeting",
+    });
+  }
 
   try {
     await validateOrReject(createVotingDto);
@@ -163,3 +130,20 @@ router.put("/:meetingId/votings/:votingId", async (req, res) => {
 });
 
 export default router;
+
+// validation 함수들의 위치 고민
+const isValidateMeetingInput = (createVotingDto: CreateVotingDto, meeting: Meeting) => {
+  // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : date
+  const isValidDate =
+    createVotingDto.dateType === undefined ||
+    createVotingDto.dateType.every((date) => {
+      return meeting.dates?.includes(date.date);
+    });
+  // 선택한 날짜가 모임 날짜에 포함되어 있는지 확인 : meal
+  const isValidMeal =
+    createVotingDto.mealType === undefined ||
+    createVotingDto.mealType.every((date) => {
+      return meeting.dates?.includes(date.date);
+    });
+  return isValidDate && isValidMeal;
+};

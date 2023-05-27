@@ -3,7 +3,7 @@ import * as express from "express";
 import * as cors from "cors";
 import MeetingRouters from "./meetingRouters";
 
-const corsMiddleware = cors({ origin: process.env.CORS_ORIGIN });
+const corsMiddleware = cors();
 
 const app = express();
 
