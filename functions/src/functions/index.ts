@@ -12,3 +12,4 @@ app.use(corsMiddleware);
 app.use("/meetings", MeetingRouters);
 
 export const v1 = functions.https.onRequest(app);
+export const dev = v1;
