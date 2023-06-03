@@ -4,7 +4,7 @@ import { Slot } from "../types";
 export class CreateVotingDto {
   @IsString()
   @MinLength(1)
-  userName: string;
+  username: string;
 
   @IsOptional()
   dateType?: Slot[];

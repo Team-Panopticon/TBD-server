@@ -3,12 +3,7 @@ import { validateOrReject } from "class-validator";
 import * as functions from "firebase-functions";
 import { CreateVotingDto } from "../../dtos/votings";
 import * as express from "express";
-import {
-  createVoting,
-  getVoting,
-  getVotings,
-  updateVoting,
-} from "../../services/voting";
+import { createVoting, getVoting, getVotings, updateVoting } from "../../services/voting";
 import { findMeeting } from "../../services/meetings";
 import { Meeting, Voting } from "../../types";
 
@@ -44,8 +39,8 @@ router.post(`/:meetingId/voting`, async (req, res) => {
 
 router.get("/:meetingId/votings", async (req, res) => {
   const { meetingId } = req.params;
-  const { userName } = req.query;
-  functions.logger.info("GET Meeting/Voting! userName =" + userName, {
+  const { username } = req.query;
+  functions.logger.info("GET Meeting/Voting! username =" + username, {
     structuredData: true,
   });
   if (meetingId === undefined || meetingId.length === 0) {
@@ -60,7 +55,7 @@ router.get("/:meetingId/votings", async (req, res) => {
 
   let votings: {
     [key: string]: Voting;
-  } = (await getVotings(meetingId, userName as string)) ?? {};
+  } = (await getVotings(meetingId, username as string)) ?? {};
 
   const parsed = Object.entries(votings).map(([key, value]) => {
     return { id: key, ...value };
