@@ -3,8 +3,8 @@ export type Meal = "lunch" | "dinner";
 export type ISODateTime = string;
 export type WithId<T> = T & { id: string };
 export enum MeetingType {
-  dateType = 'dateType',
-  mealType = 'mealType',
+  dateType = "dateType",
+  mealType = "mealType",
 }
 export type Meeting = {
   name: string;
@@ -18,7 +18,7 @@ export type Meeting = {
 };
 
 export type Voting = {
-  userName: string;
+  username: string;
   dateType: Slot[];
   mealType: Slot[];
 };
