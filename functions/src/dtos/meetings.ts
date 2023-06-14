@@ -21,9 +21,6 @@ export class CreateMeetingDto {
   @Matches(/^dateType|mealType$/)
   type: MeetingType;
 
-  @IsDateString()
-  deadline: ISODateTime;
-
   @IsOptional()
   @IsString()
   @Length(4, 4)
