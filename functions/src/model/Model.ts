@@ -1,4 +1,4 @@
-import { uuidv4 } from "@firebase/util";
+import { uuidv4 } from '@firebase/util';
 import {
   child,
   Database,
@@ -11,8 +11,8 @@ import {
   query,
   QueryConstraint,
   update,
-} from "firebase/database";
-import { WithId } from "../types";
+} from 'firebase/database';
+import { WithId } from '../types';
 
 export abstract class Model<T extends object> {
   prefixPath: string;

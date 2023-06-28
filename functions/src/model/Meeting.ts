@@ -1,9 +1,9 @@
-import { Meeting } from "./../types";
-import { Model } from "./Model";
+import { Meeting } from './../types';
+import { Model } from './Model';
 
 export class MeetingModel extends Model<Meeting> {
   constructor() {
-    super("meetings");
+    super('meetings');
   }
 
   get path() {
