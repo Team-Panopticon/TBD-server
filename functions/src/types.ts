@@ -12,8 +12,6 @@ export type Meeting = {
   dates: ISODateTime[];
   type: MeetingType;
   status: "in progress" | "done";
-  /** ISO8601 DateTime 형식 */
-  deadline: ISODateTime;
   password?: string; // sha256 hashed value in database
 };
 
