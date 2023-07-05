@@ -9,7 +9,7 @@ import { Meeting, Voting } from '../../types';
 
 const router = express.Router();
 
-router.post(`/:meetingId/voting`, async (req, res) => {
+router.post(`/:meetingId/votings`, async (req, res) => {
   functions.logger.info('POST VOTING!', { structuredData: true });
   const { meetingId } = req.params;
 

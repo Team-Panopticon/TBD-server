@@ -7,7 +7,6 @@ const getSampleCreateMeetingDto = () => {
   createMeetingDto.name = 'My Meeting';
   createMeetingDto.dates = ['2021-01-01T00:00:00.000Z', '2021-01-02T00:00:00.000Z'];
   createMeetingDto.type = MeetingType.dateType;
-  createMeetingDto.deadline = '2021-01-01T00:00:00.000Z';
   createMeetingDto.password = '1234';
 
   return createMeetingDto;
@@ -35,12 +34,6 @@ describe('CreateMeetingDto field validation', () => {
   it('Rejects if type is not "date" or "meal"', async () => {
     let meeting = getSampleCreateMeetingDto();
     (meeting.type as any) = 'invalid';
-
-    await expect(validateOrReject(meeting)).rejects.toBeTruthy();
-  });
-  it('Rejects if deadline is not an ISO8601 string', async () => {
-    let meeting = getSampleCreateMeetingDto();
-    meeting.deadline = '2021/01/01';
 
     await expect(validateOrReject(meeting)).rejects.toBeTruthy();
   });

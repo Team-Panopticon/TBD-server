@@ -4,13 +4,7 @@ import { CreateMeetingDto } from '../dtos/meetings';
 
 const meetingModel = new MeetingModel();
 
-export const createMeeting = async ({
-  name,
-  dates,
-  type,
-  deadline,
-  password,
-}: CreateMeetingDto) => {
+export const createMeeting = async ({ name, dates, type, password }: CreateMeetingDto) => {
   let passwordHash = undefined;
 
   if (password !== undefined) {
@@ -22,7 +16,6 @@ export const createMeeting = async ({
     dates,
     type,
     status: 'in progress',
-    deadline,
     // HACK: Firebase does not accept object with undefined value
     // Don't add 'password' key in object when password is undefined
     ...(password ? { password: passwordHash } : {}),
