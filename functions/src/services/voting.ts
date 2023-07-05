@@ -1,9 +1,9 @@
-import { CreateVotingDto } from "../dtos/votings";
-import { VotingModel } from "../model/Voting";
-import { equalTo, orderByChild } from "firebase/database";
+import { CreateVotingDto } from '../dtos/votings';
+import { VotingModel } from '../model/Voting';
+import { equalTo, orderByChild } from 'firebase/database';
 export const createVoting = async (
   meetingId: string,
-  { username, dateType = [], mealType = [] }: CreateVotingDto
+  { username, dateType = [], mealType = [] }: CreateVotingDto,
 ) => {
   const votingModel = new VotingModel(meetingId);
 
@@ -25,8 +25,8 @@ export const getVoting = async (meetingId: string, votingId: string) => {
 
 export const getVotings = async (meetingId: string, username?: string) => {
   const votingModel = new VotingModel(meetingId);
-  const quries = [orderByChild("username")];
-  if (username && username !== "") quries.push(equalTo(username));
+  const quries = [orderByChild('username')];
+  if (username && username !== '') quries.push(equalTo(username));
   const votings = await votingModel.findAll(...quries);
 
   return votings;
@@ -35,7 +35,7 @@ export const getVotings = async (meetingId: string, username?: string) => {
 export const updateVoting = async (
   meetingId: string,
   votingId: string,
-  { username, dateType = [], mealType = [] }: CreateVotingDto
+  { username, dateType = [], mealType = [] }: CreateVotingDto,
 ) => {
   const votingModel = new VotingModel(meetingId);
 

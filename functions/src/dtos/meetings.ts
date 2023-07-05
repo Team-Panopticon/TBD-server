@@ -5,8 +5,8 @@ import {
   Matches,
   Length,
   ArrayNotEmpty,
-} from "class-validator";
-import { ISODateTime, MeetingType } from "../types";
+} from 'class-validator';
+import { ISODateTime, MeetingType } from '../types';
 
 export class CreateMeetingDto {
   @IsString()

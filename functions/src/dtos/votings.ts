@@ -1,5 +1,5 @@
-import { IsOptional, IsString, MinLength } from "class-validator";
-import { Slot } from "../types";
+import { IsOptional, IsString, MinLength } from 'class-validator';
+import { Slot } from '../types';
 
 export class CreateVotingDto {
   @IsString()

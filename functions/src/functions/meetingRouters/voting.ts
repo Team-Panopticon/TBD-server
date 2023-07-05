@@ -1,25 +1,25 @@
-import { plainToInstance } from "class-transformer";
-import { validateOrReject } from "class-validator";
-import * as functions from "firebase-functions";
-import { CreateVotingDto } from "../../dtos/votings";
-import * as express from "express";
-import { createVoting, getVoting, getVotings, updateVoting } from "../../services/voting";
-import { findMeeting } from "../../services/meetings";
-import { Meeting, Voting } from "../../types";
+import { plainToInstance } from 'class-transformer';
+import { validateOrReject } from 'class-validator';
+import * as functions from 'firebase-functions';
+import { CreateVotingDto } from '../../dtos/votings';
+import * as express from 'express';
+import { createVoting, getVoting, getVotings, updateVoting } from '../../services/voting';
+import { findMeeting } from '../../services/meetings';
+import { Meeting, Voting } from '../../types';
 
 const router = express.Router();
 
 router.post(`/:meetingId/votings`, async (req, res) => {
-  functions.logger.info("POST VOTING!", { structuredData: true });
+  functions.logger.info('POST VOTING!', { structuredData: true });
   const { meetingId } = req.params;
 
   const meeting = await findMeeting(meetingId);
   if (meeting === null) {
-    res.status(404).send({ message: "Not found Meeting Info" });
+    res.status(404).send({ message: 'Not found Meeting Info' });
     return;
   }
-  if (meeting.status === "done") {
-    res.status(400).send({ message: "Meeting Already Closed" });
+  if (meeting.status === 'done') {
+    res.status(400).send({ message: 'Meeting Already Closed' });
     return;
   }
 
@@ -28,7 +28,7 @@ router.post(`/:meetingId/votings`, async (req, res) => {
   // 유효성 검사
   if (isValidateMeetingInput(createVotingDto, meeting) === false) {
     return res.status(422).send({
-      message: "Invalid input, Selected Date not included in Meeting",
+      message: 'Invalid input, Selected Date not included in Meeting',
     });
   }
 
@@ -37,20 +37,20 @@ router.post(`/:meetingId/votings`, async (req, res) => {
   return res.status(201).send(createdVoting);
 });
 
-router.get("/:meetingId/votings", async (req, res) => {
+router.get('/:meetingId/votings', async (req, res) => {
   const { meetingId } = req.params;
   const { username } = req.query;
-  functions.logger.info("GET Meeting/Voting! username =" + username, {
+  functions.logger.info('GET Meeting/Voting! username =' + username, {
     structuredData: true,
   });
   if (meetingId === undefined || meetingId.length === 0) {
-    return res.status(404).send({ message: "Invalid input" });
+    return res.status(404).send({ message: 'Invalid input' });
   }
 
   // 미팅이 존재하는지 검사
   const meeting = await findMeeting(meetingId);
   if (meeting === null) {
-    return res.status(404).send({ message: "Not found Meeting Info" });
+    return res.status(404).send({ message: 'Not found Meeting Info' });
   }
 
   let votings: {
@@ -63,9 +63,9 @@ router.get("/:meetingId/votings", async (req, res) => {
   return res.send(parsed);
 });
 
-router.get("/:meetingId/votings/:votingId", async (req, res) => {
+router.get('/:meetingId/votings/:votingId', async (req, res) => {
   const { meetingId, votingId } = req.params;
-  functions.logger.info("GET Meeting/Voting! votingId =" + votingId, {
+  functions.logger.info('GET Meeting/Voting! votingId =' + votingId, {
     structuredData: true,
   });
   if (
@@ -74,16 +74,16 @@ router.get("/:meetingId/votings/:votingId", async (req, res) => {
     votingId === undefined ||
     votingId.length === 0
   ) {
-    return res.status(422).send({ message: "Invalid input" });
+    return res.status(422).send({ message: 'Invalid input' });
   }
 
   const Voting = await getVoting(meetingId, votingId);
   return res.send(Voting);
 });
 
-router.put("/:meetingId/votings/:votingId", async (req, res) => {
+router.put('/:meetingId/votings/:votingId', async (req, res) => {
   const { meetingId, votingId } = req.params;
-  functions.logger.info("PUT Meeting/Voting! votingId =" + votingId, {
+  functions.logger.info('PUT Meeting/Voting! votingId =' + votingId, {
     structuredData: true,
   });
   if (
@@ -92,31 +92,31 @@ router.put("/:meetingId/votings/:votingId", async (req, res) => {
     votingId === undefined ||
     votingId.length === 0
   ) {
-    return res.status(422).send({ message: "Invalid input" });
+    return res.status(422).send({ message: 'Invalid input' });
   }
 
   const createVotingDto = plainToInstance(CreateVotingDto, req.body);
   const meeting = await findMeeting(meetingId);
   if (meeting === null) {
-    res.status(404).send({ message: "Not found Meeting Info" });
+    res.status(404).send({ message: 'Not found Meeting Info' });
     return;
   }
-  if (meeting.status === "done") {
-    res.status(400).send({ message: "Meeting Already Closed" });
+  if (meeting.status === 'done') {
+    res.status(400).send({ message: 'Meeting Already Closed' });
     return;
   }
 
   // 유효성 검사
   if (isValidateMeetingInput(createVotingDto, meeting) === false) {
     return res.status(422).send({
-      message: "Invalid input, Selected Date not included in Meeting",
+      message: 'Invalid input, Selected Date not included in Meeting',
     });
   }
 
   try {
     await validateOrReject(createVotingDto);
   } catch (errors) {
-    res.status(422).send({ message: "Invalid input" });
+    res.status(422).send({ message: 'Invalid input' });
     return;
   }
   const voting = await updateVoting(meetingId, votingId, createVotingDto);
