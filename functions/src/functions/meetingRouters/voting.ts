@@ -9,42 +9,47 @@ import { Meeting, Voting } from '../../types';
 
 const router = express.Router();
 
+class HttpError extends Error {
+  constructor(public code: number, public message: string) {
+    super();
+  }
+}
+
 router.post(`/:meetingId/votings`, async (req, res) => {
   functions.logger.info('POST VOTING!', { structuredData: true });
   const { meetingId } = req.params;
 
   const createVotingDto = plainToInstance(CreateVotingDto, req.body);
 
-  const validateMeeting = new Promise<void>(async (resolve, reject) => {
+  const validateMeeting = async () => {
     const meeting = await findMeeting(meetingId);
     if (meeting === null) {
-      return reject({ code: 404, message: 'Not found Meeting Info' });
+      throw new HttpError(404, 'Not found Meeting Info');
     }
     if (meeting.status === 'done') {
-      return reject({ code: 400, message: 'Meeting Already Closed' });
+      throw new HttpError(404, 'Not found Meeting Info');
     }
 
     // 유효성 검사
     if (isValidateMeetingInput(createVotingDto, meeting) === false) {
-      return reject({ code: 422, message: 'Invalid input, Selected Date not included in Meeting' });
+      throw new HttpError(422, 'Invalid input, Selected Date not included in Meeting');
     }
+  };
 
-    resolve();
-  });
-
-  const validateUsernameNotExist = new Promise<void>(async (resolve, reject) => {
+  const validateUsernameNotExist = async () => {
     const voting = await getVotings(meetingId, createVotingDto.username);
     if (voting) {
-      return reject({ code: 422, message: 'username Already Exists.' });
+      throw new HttpError(422, 'username Already Exists.');
     }
-    resolve();
-  });
+  };
 
   try {
     await Promise.all([validateMeeting, validateUsernameNotExist]);
   } catch (e) {
-    const error = e as { code: number; message: string };
-    return res.status(error.code).send({ message: error.message });
+    if (e instanceof HttpError) {
+      return res.status(e.code).send({ message: e.message });
+    }
+    return res.status(404).send({ message: 'Validation Failed' });
   }
 
   const createdVoting = await createVoting(meetingId, createVotingDto);
