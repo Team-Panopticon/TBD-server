@@ -19,7 +19,6 @@ router.post(`/:meetingId/votings`, async (req, res) => {
     const meeting = await findMeeting(meetingId);
     if (meeting === null) {
       return reject({ code: 404, message: 'Not found Meeting Info' });
-      return;
     }
     if (meeting.status === 'done') {
       return reject({ code: 400, message: 'Meeting Already Closed' });
