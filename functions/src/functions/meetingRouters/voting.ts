@@ -21,30 +21,11 @@ router.post(`/:meetingId/votings`, async (req, res) => {
 
   const createVotingDto = plainToInstance(CreateVotingDto, req.body);
 
-  const validateMeeting = async () => {
-    const meeting = await findMeeting(meetingId);
-    if (meeting === null) {
-      throw new HttpError(404, 'Not found Meeting Info');
-    }
-    if (meeting.status === 'done') {
-      throw new HttpError(404, 'Not found Meeting Info');
-    }
-
-    // 유효성 검사
-    if (isValidateMeetingInput(createVotingDto, meeting) === false) {
-      throw new HttpError(422, 'Invalid input, Selected Date not included in Meeting');
-    }
-  };
-
-  const validateUsernameNotExist = async () => {
-    const voting = await getVotings(meetingId, createVotingDto.username);
-    if (voting) {
-      throw new HttpError(422, 'username Already Exists.');
-    }
-  };
+  const isMeetingNotDonePromise = validateMeetingIsNotDone(createVotingDto, meetingId);
+  const isValidUsernamePromise = validateUsernameExist(createVotingDto, meetingId);
 
   try {
-    await Promise.all([validateMeeting, validateUsernameNotExist]);
+    await Promise.all([isMeetingNotDonePromise, isValidUsernamePromise]);
   } catch (e) {
     if (e instanceof HttpError) {
       return res.status(e.code).send({ message: e.message });
@@ -161,4 +142,32 @@ const isValidateMeetingInput = (createVotingDto: CreateVotingDto, meeting: Meeti
       return meeting.dates?.includes(date.date);
     });
   return isValidDate && isValidMeal;
+};
+
+const validateMeetingIsNotDone = async (
+  createVotingDto: CreateVotingDto,
+  meetingId: string,
+): Promise<void> => {
+  const meeting = await findMeeting(meetingId);
+  if (meeting === null) {
+    throw new HttpError(404, 'Not found Meeting Info');
+  }
+  if (meeting.status === 'done') {
+    throw new HttpError(404, 'Not found Meeting Info');
+  }
+
+  // 유효성 검사
+  if (isValidateMeetingInput(createVotingDto, meeting) === false) {
+    throw new HttpError(422, 'Invalid input, Selected Date not included in Meeting');
+  }
+};
+
+const validateUsernameExist = async (
+  createVotingDto: CreateVotingDto,
+  meetingId: string,
+): Promise<void> => {
+  const voting = await getVotings(meetingId, createVotingDto.username);
+  if (voting) {
+    throw new HttpError(422, 'username Already Exists.');
+  }
 };
