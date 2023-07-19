@@ -1,5 +1,5 @@
-import { IsOptional, IsString, MinLength } from 'class-validator';
-import { Slot } from '../types';
+import { IsDateString, IsOptional, IsString, Matches, MinLength } from 'class-validator';
+import { Meal, Slot } from '../types';
 
 export class CreateVotingDto {
   @IsString()
@@ -11,4 +11,13 @@ export class CreateVotingDto {
 
   @IsOptional()
   mealType?: Slot[];
+}
+
+export class VotingSlotDto implements Slot {
+  @IsDateString()
+  date: string;
+
+  @IsString()
+  @Matches(/^lunch|dinner$/)
+  meal?: Meal;
 }
