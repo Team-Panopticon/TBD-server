@@ -74,8 +74,8 @@ export abstract class Model<T extends object> {
         .catch(reject);
     });
   }
-  update(id: string, document: T) {
-    return new Promise<WithId<T>>((resolve, reject) => {
+  update(id: string, document: Partial<T>) {
+    return new Promise<WithId<Partial<T>>>((resolve, reject) => {
       update(ref(this.database, `${this.path}/${id}`), { ...document })
         .then(() => resolve({ id, ...document }))
         .catch(reject);
