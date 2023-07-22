@@ -23,7 +23,13 @@ router.post(`/:meetingId/votings`, async (req, res) => {
     return;
   }
 
+  
   const createVotingDto = plainToInstance(CreateVotingDto, req.body);
+
+  if(createVotingDto.username.length > 20){
+    res.status(400).send({ message: 'Invalid username length' })
+    return;
+  }
 
   // 유효성 검사
   if (isValidateMeetingInput(createVotingDto, meeting) === false) {
