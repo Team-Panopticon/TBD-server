@@ -9,33 +9,28 @@ import { Meeting, Voting } from '../../types';
 
 const router = express.Router();
 
+class HttpError extends Error {
+  constructor(public code: number, public message: string) {
+    super();
+  }
+}
+
 router.post(`/:meetingId/votings`, async (req, res) => {
   functions.logger.info('POST VOTING!', { structuredData: true });
   const { meetingId } = req.params;
 
-  const meeting = await findMeeting(meetingId);
-  if (meeting === null) {
-    res.status(404).send({ message: 'Not found Meeting Info' });
-    return;
-  }
-  if (meeting.status === 'done') {
-    res.status(400).send({ message: 'Meeting Already Closed' });
-    return;
-  }
-
-  
   const createVotingDto = plainToInstance(CreateVotingDto, req.body);
 
-  if(createVotingDto.username.length > 20){
-    res.status(400).send({ message: 'Invalid username length' })
-    return;
-  }
+  const isMeetingNotDonePromise = validateMeetingIsNotDone(createVotingDto, meetingId);
+  const isValidUsernamePromise = validateUsername(createVotingDto, meetingId);
 
-  // 유효성 검사
-  if (isValidateMeetingInput(createVotingDto, meeting) === false) {
-    return res.status(422).send({
-      message: 'Invalid input, Selected Date not included in Meeting',
-    });
+  try {
+    await Promise.all([isMeetingNotDonePromise, isValidUsernamePromise]);
+  } catch (e) {
+    if (e instanceof HttpError) {
+      return res.status(e.code).send({ message: e.message });
+    }
+    return res.status(404).send({ message: 'Validation Failed' });
   }
 
   const createdVoting = await createVoting(meetingId, createVotingDto);
@@ -147,4 +142,36 @@ const isValidateMeetingInput = (createVotingDto: CreateVotingDto, meeting: Meeti
       return meeting.dates?.includes(date.date);
     });
   return isValidDate && isValidMeal;
+};
+
+const validateMeetingIsNotDone = async (
+  createVotingDto: CreateVotingDto,
+  meetingId: string,
+): Promise<void> => {
+  const meeting = await findMeeting(meetingId);
+  if (meeting === null) {
+    throw new HttpError(404, 'Not found Meeting Info');
+  }
+  if (meeting.status === 'done') {
+    throw new HttpError(404, 'Not found Meeting Info');
+  }
+
+  // 유효성 검사
+  if (isValidateMeetingInput(createVotingDto, meeting) === false) {
+    throw new HttpError(422, 'Invalid input, Selected Date not included in Meeting');
+  }
+};
+
+const validateUsername = async (
+  createVotingDto: CreateVotingDto,
+  meetingId: string,
+): Promise<void> => {
+  if (createVotingDto.username.length > 20) {
+    throw new HttpError(400, 'Invalid username length');
+  }
+
+  const voting = await getVotings(meetingId, createVotingDto.username);
+  if (voting) {
+    throw new HttpError(422, 'username Already Exists.');
+  }
 };
