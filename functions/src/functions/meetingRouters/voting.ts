@@ -22,7 +22,7 @@ router.post(`/:meetingId/votings`, async (req, res) => {
   const createVotingDto = plainToInstance(CreateVotingDto, req.body);
 
   const isMeetingNotDonePromise = validateMeetingIsNotDone(createVotingDto, meetingId);
-  const isValidUsernamePromise = validateUsernameExist(createVotingDto, meetingId);
+  const isValidUsernamePromise = validateUsername(createVotingDto, meetingId);
 
   try {
     await Promise.all([isMeetingNotDonePromise, isValidUsernamePromise]);
@@ -162,10 +162,14 @@ const validateMeetingIsNotDone = async (
   }
 };
 
-const validateUsernameExist = async (
+const validateUsername = async (
   createVotingDto: CreateVotingDto,
   meetingId: string,
 ): Promise<void> => {
+  if (createVotingDto.username.length > 20) {
+    throw new HttpError(400, 'Invalid username length');
+  }
+
   const voting = await getVotings(meetingId, createVotingDto.username);
   if (voting) {
     throw new HttpError(422, 'username Already Exists.');
