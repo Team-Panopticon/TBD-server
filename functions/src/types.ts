@@ -13,6 +13,7 @@ export type Meeting = {
   type: MeetingType;
   status: 'in progress' | 'done';
   password?: string; // sha256 hashed value in database
+  confirmedDateType?: Slot;
 };
 
 export type Voting = {
