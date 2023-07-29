@@ -1,8 +1,8 @@
 import { plainToInstance } from 'class-transformer';
 import { validateOrReject } from 'class-validator';
 import * as functions from 'firebase-functions';
-import { CreateMeetingDto } from '../../dtos/meetings';
-import { confirmMeeting, createMeeting, findMeeting } from '../../services/meetings';
+import { CreateMeetingDto, UpdateMeetingDto } from '../../dtos/meetings';
+import { confirmMeeting, createMeeting, findMeeting, updateMeeting } from '../../services/meetings';
 import * as express from 'express';
 import { createHash } from 'crypto';
 import { sign, verify } from 'jsonwebtoken';
@@ -99,16 +99,29 @@ router.post(`/`, async (req, res) => {
   res.status(201).send(createdMeetingWithoutPassword);
 });
 
-router.put('/', (req, res) => {
+router.put('/:meetingId', async (req, res) => {
   functions.logger.info('PUT Meeting!', { structuredData: true });
 
-  // Stub
-  res.send({
-    name: 'test',
-    dates: [],
-    types: 'meal',
-    status: 'in progress',
-  });
+  const { meetingId } = req.params;
+  const updateMeetingDto = plainToInstance(UpdateMeetingDto, req.body);
+
+  try {
+    await validateOrReject(updateMeetingDto);
+  } catch (errors) {
+    res.status(422).send({ message: 'Invalid input' });
+    return;
+  }
+
+  await updateMeeting(meetingId, updateMeetingDto);
+  const meeting = await findMeeting(meetingId);
+  if (meeting === null) {
+    return res.status(500).send({ message: 'Internal server error' });
+  }
+
+  const { password, ...meetingWithoutPassword } = meeting;
+  const meetingWithId = { id: meetingId, ...meetingWithoutPassword };
+
+  return res.status(200).send(meetingWithId);
 });
 
 export default router;
