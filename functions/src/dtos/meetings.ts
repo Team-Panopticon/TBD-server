@@ -8,7 +8,7 @@ import {
 } from 'class-validator';
 import { ISODateTime, MeetingType } from '../types';
 
-export class CreateMeetingDto {
+export class UpdateMeetingDto {
   @IsString()
   @Length(1, 100)
   name: string;
@@ -20,7 +20,9 @@ export class CreateMeetingDto {
   @IsString()
   @Matches(/^dateType|mealType$/)
   type: MeetingType;
+}
 
+export class CreateMeetingDto extends UpdateMeetingDto  {
   @IsOptional()
   @IsString()
   @Length(4, 4)
