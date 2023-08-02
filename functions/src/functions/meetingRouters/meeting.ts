@@ -40,13 +40,13 @@ router.post('/:meetingId/confirm', async (req, res) => {
 
   const { meetingId } = req.params;
   if (!token || !meetingId) {
-    return res.status(401).send({ message: 'Authorize Failed' });
+    return res.status(401).send({ message: 'Authorization Failed' });
   }
 
   const decodedToken = verify(token, process.env.JWT_SECRET_KEY as string);
 
   if (typeof decodedToken === 'string' || decodedToken.id !== meetingId) {
-    return res.status(401).send({ message: 'Authorize Failed' });
+    return res.status(401).send({ message: 'Authorization Failed' });
   }
 
   const votingSlotDto = plainToInstance(VotingSlotDto, req.body);
@@ -101,8 +101,19 @@ router.post(`/`, async (req, res) => {
 
 router.put('/:meetingId', async (req, res) => {
   functions.logger.info('PUT Meeting!', { structuredData: true });
+  const token = req.headers.authorization?.split('Bearer ')[1];
 
   const { meetingId } = req.params;
+  if (!token || !meetingId) {
+    return res.status(401).send({ message: 'Authorization Failed' });
+  }
+
+  const decodedToken = verify(token, process.env.JWT_SECRET_KEY as string);
+
+  if (typeof decodedToken === 'string' || decodedToken.id !== meetingId) {
+    return res.status(401).send({ message: 'Authorization Failed' });
+  }
+
   const updateMeetingDto = plainToInstance(UpdateMeetingDto, req.body);
 
   try {
