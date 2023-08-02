@@ -16,7 +16,7 @@ export const createMeeting = async ({ name, dates, type, password }: CreateMeeti
     name,
     dates,
     type,
-    status: 'in progress',
+    status: 'inProgress',
     // HACK: Firebase does not accept object with undefined value
     // Don't add 'password' key in object when password is undefined
     ...(password ? { password: passwordHash } : {}),
