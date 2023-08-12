@@ -11,7 +11,7 @@ export type Meeting = {
   /** ISO8601 DateTime 형식의 목록 */
   dates: ISODateTime[];
   type: MeetingType;
-  status: 'in progress' | 'done';
+  status: 'inProgress' | 'done';
   password?: string; // sha256 hashed value in database
   confirmedDateType?: Slot;
 };
