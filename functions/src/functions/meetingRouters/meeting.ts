@@ -13,14 +13,19 @@ const router = express.Router();
 router.post('/:meetingId/auth', async (req, res) => {
   functions.logger.info('Authorize Meeting', { structuredData: true });
 
-  const password = req.body.password;
-  const hashedPassword = createHash('sha256').update(password).digest('hex');
-
   const { meetingId } = req.params;
   const meeting = await findMeeting(meetingId);
 
-  if (!meeting || meeting.password !== hashedPassword) {
-    return res.status(401).send({ message: 'Authorize Failed' });
+  if (!meeting) {
+    return res.status(404).send({ message: 'Not found' });
+  }
+
+  const isPrivateMeeting = meeting.access === 'private';
+  const password = req.body.password;
+  const hashedPassword = isPrivateMeeting ? createHash('sha256').update(password).digest('hex') : undefined;
+
+  if (meeting.password !== hashedPassword) {
+    return res.status(401).send({ message: 'Authorization Failed' });
   }
 
   const token = sign(
