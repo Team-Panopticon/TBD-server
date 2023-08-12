@@ -7,18 +7,22 @@ import {
   ArrayNotEmpty,
 } from 'class-validator';
 import { ISODateTime, MeetingType } from '../types';
+import { Expose } from 'class-transformer';
 
 export class UpdateMeetingDto {
   @IsString()
   @Length(1, 100)
+  @Expose()
   name: string;
 
   @ArrayNotEmpty()
   @IsDateString({}, { each: true })
+  @Expose()
   dates: ISODateTime[];
 
   @IsString()
   @Matches(/^dateType|mealType$/)
+  @Expose()
   type: MeetingType;
 }
 

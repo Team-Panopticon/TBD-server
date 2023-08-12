@@ -114,7 +114,7 @@ router.put('/:meetingId', async (req, res) => {
     return res.status(401).send({ message: 'Authorization Failed' });
   }
 
-  const updateMeetingDto = plainToInstance(UpdateMeetingDto, req.body);
+  const updateMeetingDto = plainToInstance(UpdateMeetingDto, req.body, { excludeExtraneousValues: true });
 
   try {
     await validateOrReject(updateMeetingDto);
