@@ -101,15 +101,19 @@ router.post(`/`, async (req, res) => {
 
 router.put('/:meetingId', async (req, res) => {
   functions.logger.info('PUT Meeting!', { structuredData: true });
-  const token = req.headers.authorization?.split('Bearer ')[1];
-
   const { meetingId } = req.params;
-  if (!token || !meetingId) {
+
+  const meeting = await findMeeting(meetingId);
+  if (meeting === null) {
+    return res.status(404).send({ message: 'Not found' });
+  }
+
+  const token = req.headers.authorization?.split('Bearer ')[1];
+  if (!token) {
     return res.status(401).send({ message: 'Authorization Failed' });
   }
 
   const decodedToken = verify(token, process.env.JWT_SECRET_KEY as string);
-
   if (typeof decodedToken === 'string' || decodedToken.id !== meetingId) {
     return res.status(401).send({ message: 'Authorization Failed' });
   }
@@ -124,12 +128,12 @@ router.put('/:meetingId', async (req, res) => {
   }
 
   await updateMeeting(meetingId, updateMeetingDto);
-  const meeting = await findMeeting(meetingId);
-  if (meeting === null) {
+  const updatedMeeting = await findMeeting(meetingId);
+  if (updatedMeeting === null) {
     return res.status(500).send({ message: 'Internal server error' });
   }
 
-  const { password, ...meetingWithoutPassword } = meeting;
+  const { password, ...meetingWithoutPassword } = updatedMeeting;
   const meetingWithId = { id: meetingId, ...meetingWithoutPassword };
 
   return res.status(200).send(meetingWithId);
