@@ -17,6 +17,7 @@ export class VotingSlotDto implements Slot {
   @IsDateString()
   date: string;
 
+  @IsOptional()
   @IsString()
   @Matches(/^lunch|dinner$/)
   meal?: Meal;
