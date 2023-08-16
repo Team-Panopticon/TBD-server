@@ -54,7 +54,7 @@ router.post('/:meetingId/confirm', async (req, res) => {
     return res.status(401).send({ message: 'Authorize Failed' });
   }
 
-  const votingSlotDto = plainToInstance(VotingSlotDto, req.body);
+  const votingSlotDto = plainToInstance(VotingSlotDto, req.body);  
   try {
     await validateOrReject(votingSlotDto);
   } catch (errors) {
@@ -63,7 +63,7 @@ router.post('/:meetingId/confirm', async (req, res) => {
 
   await confirmMeeting(meetingId, votingSlotDto);
 
-  return res.status(201);
+  return res.status(201).send();
 });
 
 router.get('/:meetingId', async (req, res) => {
