@@ -14,7 +14,7 @@ export type Meeting = {
   status: 'inProgress' | 'done';
   password?: string; // sha256 hashed value in database
   confirmedDateType?: Slot;
-  access: 'public' | 'private';
+  adminAccess: 'public' | 'private';
 };
 
 export type Voting = {

@@ -20,7 +20,7 @@ router.post('/:meetingId/auth', async (req, res) => {
     return res.status(404).send({ message: 'Not found' });
   }
 
-  const isPrivateMeeting = meeting.access === 'private';
+  const isPrivateMeeting = meeting.adminAccess === 'private';
   const password = req.body.password;
   const hashedPassword = isPrivateMeeting ? createHash('sha256').update(password).digest('hex') : undefined;
 
