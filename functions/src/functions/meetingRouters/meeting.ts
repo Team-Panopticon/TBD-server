@@ -1,8 +1,8 @@
 import { plainToInstance } from 'class-transformer';
 import { validateOrReject } from 'class-validator';
 import * as functions from 'firebase-functions';
-import { CreateMeetingDto } from '../../dtos/meetings';
-import { confirmMeeting, createMeeting, findMeeting } from '../../services/meetings';
+import { CreateMeetingDto, UpdateMeetingDto } from '../../dtos/meetings';
+import { confirmMeeting, createMeeting, findMeeting, updateMeeting } from '../../services/meetings';
 import * as express from 'express';
 import { createHash } from 'crypto';
 import { sign, verify } from 'jsonwebtoken';
@@ -40,13 +40,13 @@ router.post('/:meetingId/confirm', async (req, res) => {
 
   const { meetingId } = req.params;
   if (!token || !meetingId) {
-    return res.status(401).send({ message: 'Authorize Failed' });
+    return res.status(401).send({ message: 'Authorization Failed' });
   }
 
   const decodedToken = verify(token, process.env.JWT_SECRET_KEY as string);
 
   if (typeof decodedToken === 'string' || decodedToken.id !== meetingId) {
-    return res.status(401).send({ message: 'Authorize Failed' });
+    return res.status(401).send({ message: 'Authorization Failed' });
   }
 
   const votingSlotDto = plainToInstance(VotingSlotDto, req.body);
@@ -99,16 +99,44 @@ router.post(`/`, async (req, res) => {
   res.status(201).send(createdMeetingWithoutPassword);
 });
 
-router.put('/', (req, res) => {
+router.put('/:meetingId', async (req, res) => {
   functions.logger.info('PUT Meeting!', { structuredData: true });
+  const { meetingId } = req.params;
 
-  // Stub
-  res.send({
-    name: 'test',
-    dates: [],
-    types: 'meal',
-    status: 'in progress',
-  });
+  const meeting = await findMeeting(meetingId);
+  if (meeting === null) {
+    return res.status(404).send({ message: 'Not found' });
+  }
+
+  const token = req.headers.authorization?.split('Bearer ')[1];
+  if (!token) {
+    return res.status(401).send({ message: 'Authorization Failed' });
+  }
+
+  const decodedToken = verify(token, process.env.JWT_SECRET_KEY as string);
+  if (typeof decodedToken === 'string' || decodedToken.id !== meetingId) {
+    return res.status(401).send({ message: 'Authorization Failed' });
+  }
+
+  const updateMeetingDto = plainToInstance(UpdateMeetingDto, req.body, { excludeExtraneousValues: true });
+
+  try {
+    await validateOrReject(updateMeetingDto);
+  } catch (errors) {
+    res.status(422).send({ message: 'Invalid input' });
+    return;
+  }
+
+  await updateMeeting(meetingId, updateMeetingDto);
+  const updatedMeeting = await findMeeting(meetingId);
+  if (updatedMeeting === null) {
+    return res.status(500).send({ message: 'Internal server error' });
+  }
+
+  const { password, ...meetingWithoutPassword } = updatedMeeting;
+  const meetingWithId = { id: meetingId, ...meetingWithoutPassword };
+
+  return res.status(200).send(meetingWithId);
 });
 
 export default router;

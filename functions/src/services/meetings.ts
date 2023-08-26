@@ -1,6 +1,6 @@
 import { MeetingModel } from '../model/Meeting';
 import { createHash } from 'crypto';
-import { CreateMeetingDto } from '../dtos/meetings';
+import { CreateMeetingDto, UpdateMeetingDto } from '../dtos/meetings';
 import { VotingSlotDto } from '../dtos/votings';
 
 const meetingModel = new MeetingModel();
@@ -24,6 +24,16 @@ export const createMeeting = async ({ name, dates, type, password }: CreateMeeti
 
   return createdMeeting;
 };
+
+export const updateMeeting = async (meetingId: string, { name, dates, type }: UpdateMeetingDto) => {
+  const updatedMeeting = await meetingModel.update(meetingId, {
+    name,
+    dates,
+    type,
+  });
+
+  return updatedMeeting;
+}
 
 export const findMeeting = async (meetingId: string) => {
   const meeting = await meetingModel.find(meetingId);
