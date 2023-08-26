@@ -1,6 +1,8 @@
 import * as dotenv from 'dotenv';
 dotenv.config();
 import { initializeApp } from 'firebase/app';
+import { initializeApp as initializeAdmin } from 'firebase-admin/app';
+// import * as admin from 'firebase-admin';
 
 const firebaseConfig = {
   apiKey: process.env.API_KEY,
@@ -15,5 +17,11 @@ const firebaseConfig = {
 };
 
 initializeApp(firebaseConfig);
+
+// const serviceAccount = require('../path-to-service-account.json');
+initializeAdmin({
+  // credential: admin.credential.cert(serviceAccount),
+  databaseURL: process.env.DATABASE_URL,
+})
 
 export * from './functions';
