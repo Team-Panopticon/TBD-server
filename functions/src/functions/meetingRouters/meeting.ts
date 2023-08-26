@@ -13,14 +13,19 @@ const router = express.Router();
 router.post('/:meetingId/auth', async (req, res) => {
   functions.logger.info('Authorize Meeting', { structuredData: true });
 
-  const password = req.body.password;
-  const hashedPassword = createHash('sha256').update(password).digest('hex');
-
   const { meetingId } = req.params;
   const meeting = await findMeeting(meetingId);
 
-  if (!meeting || meeting.password !== hashedPassword) {
-    return res.status(401).send({ message: 'Authorize Failed' });
+  if (!meeting) {
+    return res.status(404).send({ message: 'Not found' });
+  }
+
+  const isPrivateMeeting = meeting.adminAccess === 'private';
+  const password = req.body.password;
+  const hashedPassword = isPrivateMeeting ? createHash('sha256').update(password).digest('hex') : undefined;
+
+  if (meeting.password !== hashedPassword) {
+    return res.status(401).send({ message: 'Authorization Failed' });
   }
 
   const token = sign(
@@ -49,7 +54,7 @@ router.post('/:meetingId/confirm', async (req, res) => {
     return res.status(401).send({ message: 'Authorization Failed' });
   }
 
-  const votingSlotDto = plainToInstance(VotingSlotDto, req.body);
+  const votingSlotDto = plainToInstance(VotingSlotDto, req.body);  
   try {
     await validateOrReject(votingSlotDto);
   } catch (errors) {
@@ -58,7 +63,7 @@ router.post('/:meetingId/confirm', async (req, res) => {
 
   await confirmMeeting(meetingId, votingSlotDto);
 
-  return res.status(201);
+  return res.status(201).send();
 });
 
 router.get('/:meetingId', async (req, res) => {
