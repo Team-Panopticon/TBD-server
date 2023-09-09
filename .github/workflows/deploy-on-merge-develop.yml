@@ -13,6 +13,17 @@ jobs:
         uses: actions/checkout@v2
       - name: Create .env file
         working-directory: ./functions
+        run: |
+          echo "API_KEY=$API_KEY" >> .env
+          echo "PROJECT_ID=$PROJECT_ID" >> .env
+          echo "MESSAGING_SENDER_ID=$MESSAGING_SENDER_ID" >> .env
+          echo "APP_ID=$APP_ID" >> .env
+          echo "DATABASE_URL=$DATABASE_URL" >> .env
+          echo "MEASUREMENT_ID=$MEASUREMENT_ID" >> .env
+          echo "CORS_ORIGIN=$CORS_ORIGIN" >> .env
+          echo "JWT_SECRET_KEY=$JWT_SECRET_KEY" >> .env
+          echo "CLIENT_EMAIL=$CLIENT_EMAIL" >> .env
+          echo "CLIENT_PRIVATE_KEY=$CLIENT_PRIVATE_KEY" >> .env
         env:
           API_KEY: ${{ secrets.API_KEY }}
           PROJECT_ID: ${{ secrets.PROJECT_ID }}
