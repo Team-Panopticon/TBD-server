@@ -1,33 +1,26 @@
 import { uuidv4 } from '@firebase/util';
-import {
-  child,
-  Database,
-  DatabaseReference,
-  get,
-  getDatabase,
-  ref,
-  remove,
-  set,
-  query,
-  QueryConstraint,
-  update,
-} from 'firebase/database';
 import { WithId } from '../types';
+import { database } from 'firebase-admin';
+import { QueryFunction } from './queryFunctions';
 
 export abstract class Model<T extends object> {
   prefixPath: string;
-  private database: Database;
-  private dbRef: DatabaseReference;
+  private database: database.Database;
 
   constructor(prefixPath: string) {
     this.prefixPath = prefixPath;
-    this.database = getDatabase();
-    this.dbRef = ref(this.database);
+    this.database = database();
+  }
+
+  private get dbRef() {
+    return this.database.ref(this.path);
   }
 
   find(id: string) {
-    return new Promise<T | null>((resolve, reject) => {
-      get(child(this.dbRef, `${this.path}/${id}`))
+    return new Promise<T | null>(async (resolve, reject) => {
+      this.dbRef
+        .child(`/${id}`)
+        .get()
         .then((snapshot) => {
           if (snapshot.exists()) {
             resolve(snapshot.val());
@@ -39,9 +32,11 @@ export abstract class Model<T extends object> {
     });
   }
 
-  findAll(...queryConstraints: QueryConstraint[]) {
+  findAll(queries: QueryFunction[]) {
     return new Promise<{ [key: string]: T } | null>((resolve, reject) => {
-      get(query(child(this.dbRef, `${this.path}`), ...queryConstraints))
+      const resultRef = queries.reduce<database.Query>((ref, fn) => fn(ref), this.dbRef);
+      resultRef
+        .get()
         .then((snapshot) => {
           if (snapshot.exists()) {
             resolve(snapshot.val());
@@ -57,7 +52,9 @@ export abstract class Model<T extends object> {
     const id = uuidv4();
 
     return new Promise<WithId<T>>((resolve, reject) => {
-      set(ref(this.database, `${this.path}/${id}`), { ...document })
+      this.dbRef
+        .child(`/${id}`)
+        .set({ ...document })
         .then(() => {
           resolve({ id, ...document });
         })
@@ -65,20 +62,26 @@ export abstract class Model<T extends object> {
     });
   }
 
-  delete(id: string) {
-    return new Promise((resolve, reject) => {
-      remove(ref(this.database, `${this.path}/${id}`))
-        .then(() => {
-          resolve(true);
-        })
-        .catch(reject);
-    });
-  }
-  
+  // delete(id: string) {
+  //   return new Promise<boolean>((resolve, reject) => {
+  //     this.dbRef
+  //       .child(`/${id}`)
+  //       .remove()
+  //       .then(() => {
+  //         resolve(true);
+  //       })
+  //       .catch(reject);
+  //   });
+  // }
+
   update(id: string, document: Partial<T>) {
     return new Promise<WithId<Partial<T>>>((resolve, reject) => {
-      update(ref(this.database, `${this.path}/${id}`), { ...document })
-        .then(() => resolve({ id, ...document }))
+      this.dbRef
+        .child(`/${id}`)
+        .update({ ...document })
+        .then(() => {
+          resolve({ id, ...document });
+        })
         .catch(reject);
     });
   }
