@@ -6,7 +6,6 @@ import * as express from 'express';
 import { createVoting, getVoting, getVotings, updateVoting } from '../../services/voting';
 import { findMeeting } from '../../services/meetings';
 import { Meeting, Voting } from '../../types';
-import { database } from 'firebase-admin';
 
 const router = express.Router();
 
@@ -15,21 +14,6 @@ class HttpError extends Error {
     super();
   }
 }
-
-router.post(`/test`, async (req, res) => {
-  console.log('POST test');
-  const testRef = database().ref('/test')
-  console.log("🚀 ~ file: voting.ts:22 ~ router.post ~ testRef:", testRef)
-  testRef.set({ key: 'value' });
-  res.send();
-})
-
-router.get('/test', async (req, res) => {
-  const testRef = database().ref('/test')
-  testRef.once('value', (data) => {
-    res.send(data.val());
-  })
-})
 
 router.post(`/:meetingId/votings`, async (req, res) => {
   functions.logger.info('POST VOTING!', { structuredData: true });
