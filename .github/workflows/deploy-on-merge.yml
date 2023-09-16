@@ -1,13 +1,14 @@
-name: Firebase
+name: Firebase Deploy
 on:
   push:
     branches:
+      - main
       - develop
 jobs:
   develop:
     name: Deploy
     runs-on: ubuntu-latest
-    environment: development
+    environment: ${{ github.ref_name == 'main' && 'main' || github.ref_name == 'develop' && 'development' }}
     steps:
       - name: Check out code
         uses: actions/checkout@v2
