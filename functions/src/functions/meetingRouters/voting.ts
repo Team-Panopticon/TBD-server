@@ -103,7 +103,7 @@ router.put('/:meetingId/votings/:votingId', async (req, res) => {
     return;
   }
   if (meeting.status === 'done') {
-    res.status(400).send({ message: 'Meeting Already Closed' });
+    res.status(400).send({ message: 'Meeting already closed' });
     return;
   }
 
@@ -153,7 +153,7 @@ const validateMeetingIsNotDone = async (
     throw new HttpError(404, 'Not found Meeting Info');
   }
   if (meeting.status === 'done') {
-    throw new HttpError(404, 'Not found Meeting Info');
+    throw new HttpError(404, 'Meeting already closed');
   }
 
   // 유효성 검사
