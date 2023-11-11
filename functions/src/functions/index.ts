@@ -11,5 +11,10 @@ app.use(corsMiddleware);
 
 app.use('/meetings', MeetingRouters);
 
+// Stub API for preventing cold start
+app.get('/warmer', (req, res) => {
+  res.send('Warming cloud functions instance')
+})
+
 export const v1 = functions.https.onRequest(app);
 export const dev = v1;
