@@ -59,8 +59,16 @@ router.get('/:meetingId/votings', async (req, res) => {
   } = (await getVotings(meetingId, username as string)) ?? {};
 
   const parsed = Object.entries(votings).map(([key, value]) => {
-    return { id: key, ...value };
+    const { username, dateType, mealType } = value;
+
+    return {
+      id: key,
+      username,
+      dateType: dateType?.filter((slot) => meeting.dates.includes(slot.date)),
+      mealType: mealType?.filter((slot) => meeting.dates.includes(slot.date)),
+    };
   });
+
   return res.send(parsed);
 });
 
