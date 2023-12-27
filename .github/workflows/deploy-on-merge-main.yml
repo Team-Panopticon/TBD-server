@@ -7,7 +7,7 @@ jobs:
   develop:
     name: Deploy
     runs-on: ubuntu-latest
-    environment: production
+    environment: main
     steps:
       - name: Check out code
         uses: actions/checkout@v2
